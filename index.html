@@ -225,38 +225,62 @@ tr:hover td { background: var(--bg); }
 @media (max-width: 1100px) { .status-cards { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 700px) { .status-cards { grid-template-columns: repeat(2, 1fr); } }
 
-/* Стили для страницы заявителя */
-.client-portal { max-width: 800px; margin: 0 auto; padding: 30px; }
-.client-portal h1 { font-size: 24px; margin-bottom: 20px; color: var(--primary-dark); }
-.client-portal .intro { background: var(--card); padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid var(--border); }
-.client-portal .intro p { margin-bottom: 10px; color: var(--text-light); }
-.client-form { background: var(--card); padding: 25px; border-radius: 8px; border: 1px solid var(--border); }
-.client-form .form-group { margin-bottom: 15px; }
+/* Стили для портала заявителя */
+.client-portal { max-width: 900px; margin: 0 auto; padding: 30px; }
+.client-portal h1 { font-size: 28px; margin-bottom: 10px; color: var(--primary-dark); }
+.client-portal .intro { background: var(--card); padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
+.client-portal .intro p { margin-bottom: 10px; color: var(--text-light); line-height: 1.6; }
+.client-form { background: var(--card); padding: 30px; border-radius: 12px; border: 1px solid var(--border); }
+.client-form h2 { margin-bottom: 20px; color: var(--primary-dark); }
+.client-form .form-group { margin-bottom: 18px; }
 .client-form textarea { min-height: 120px; }
-.client-form .btn { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; }
-.success-message { background: #d1fae5; color: #065f46; padding: 20px; border-radius: 8px; text-align: center; }
-.success-message h2 { margin-bottom: 10px; }
-.success-message p { margin-bottom: 15px; }
+.client-form .btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; margin-top: 10px; }
+.success-message { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; padding: 30px; border-radius: 12px; text-align: center; }
+.success-message h2 { margin-bottom: 15px; font-size: 24px; }
+.success-message p { margin-bottom: 12px; font-size: 15px; }
+.success-message .ticket-number { font-size: 20px; font-weight: 700; color: var(--primary-dark); background: white; padding: 8px 16px; border-radius: 8px; display: inline-block; margin: 10px 0; }
+.client-portal-footer { margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid var(--border); }
+.client-portal-footer a { color: var(--text-muted); font-size: 12px; text-decoration: none; }
+.client-portal-footer a:hover { color: var(--primary); }
+
+/* Личный кабинет заявителя */
+.client-dashboard { max-width: 1000px; margin: 0 auto; padding: 30px; }
+.client-dashboard-header { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.client-dashboard-header h2 { color: var(--primary-dark); }
+.client-tickets-list { display: flex; flex-direction: column; gap: 12px; }
+.client-ticket-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; }
+.client-ticket-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.client-ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.client-ticket-number { font-family: monospace; font-size: 14px; color: var(--text-muted); }
+.client-ticket-subject { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.client-ticket-meta { display: flex; gap: 15px; font-size: 12px; color: var(--text-light); flex-wrap: wrap; }
+.client-chat { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 20px; margin-top: 20px; }
+.client-chat-header { font-size: 16px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.client-chat-messages { max-height: 400px; overflow-y: auto; margin-bottom: 15px; }
+.client-chat-input { display: flex; gap: 10px; }
+.client-chat-input textarea { flex: 1; min-height: 60px; }
+.client-chat-input .btn { height: 60px; }
 </style>
 </head>
 <body>
 
-<!-- СТРАНИЦА ДЛЯ ЗАЯВИТЕЛЕЙ -->
-<div class="client-portal" id="clientPortal" style="display:none">
+<!-- ПОРТАЛ ЗАЯВИТЕЛЯ (Главная страница) -->
+<div class="client-portal" id="clientPortal">
   <div style="text-align:center;margin-bottom:30px">
-    <div style="font-size:48px;margin-bottom:10px">🎪</div>
+    <div style="font-size:64px;margin-bottom:10px">🎪</div>
     <h1>Ярмарка CRM</h1>
-    <p style="color:var(--text-light)">Портал для заявителей</p>
+    <p style="color:var(--text-light);font-size:16px">Портал для заявителей</p>
   </div>
   
   <div class="intro">
-    <p> <strong>Добро пожаловать!</strong></p>
+    <p><strong>Добро пожаловать!</strong></p>
     <p>Здесь вы можете создать заявку и отслеживать её статус. После отправки заявки с вами свяжется наш специалист.</p>
+    <p style="margin-top:15px;padding-top:15px;border-top:1px solid var(--border)"><strong>📞 Уже есть заявка?</strong> Войдите в личный кабинет по номеру телефона и паролю, которые вы указали при создании первой заявки.</p>
   </div>
 
   <div id="clientFormSection">
     <div class="client-form">
-      <h2 style="margin-bottom:20px">📝 Создать заявку</h2>
+      <h2>📝 Создать заявку</h2>
       <form id="publicTicketForm" onsubmit="window.createPublicTicket(event)">
         <div class="form-row">
           <div class="form-group">
@@ -264,14 +288,27 @@ tr:hover td { background: var(--bg); }
             <input type="text" id="publicClientName" required placeholder="Иванов Иван">
           </div>
           <div class="form-group">
-            <label>Телефон *</label>
-            <input type="tel" id="publicClientPhone" required placeholder="+7 900 123-45-67">
+            <label>Телефон (логин) *</label>
+            <input type="tel" id="publicClientPhone" required placeholder="+79121234567 или 89121234567" pattern="[\+]?[0-9\s\-\(\)]{10,}">
+            <div class="form-hint">Формат: +79121234567 или 89121234567</div>
           </div>
         </div>
         
         <div class="form-group">
           <label>Email</label>
           <input type="email" id="publicClientEmail" placeholder="email@example.com">
+        </div>
+
+        <div class="form-group">
+          <label>Номер договора *</label>
+          <input type="text" id="publicContractNumber" required placeholder="Например: Д-2024-001">
+          <div class="form-hint">Укажите номер вашего договора с нами</div>
+        </div>
+
+        <div class="form-group" id="passwordField" style="display:none">
+          <label>Придумайте пароль *</label>
+          <input type="password" id="publicClientPassword" placeholder="Минимум 4 символа" minlength="4">
+          <div class="form-hint">Этот пароль будет использоваться для входа в личный кабинет</div>
         </div>
 
         <div class="form-group">
@@ -310,14 +347,62 @@ tr:hover td { background: var(--bg); }
   <div id="clientSuccessSection" style="display:none">
     <div class="success-message">
       <h2>✅ Заявка успешно создана!</h2>
-      <p>Номер вашей заявки: <strong id="createdTicketNumber"></strong></p>
+      <p>Номер вашей заявки:</p>
+      <div class="ticket-number" id="createdTicketNumber"></div>
       <p>Наш специалист свяжется с вами в ближайшее время.</p>
-      <button class="btn btn-primary" onclick="window.resetClientForm()" style="margin-top:15px">📝 Создать ещё одну заявку</button>
+      <p style="margin-top:20px;font-size:13px"><strong>Сохраните ваши данные для входа:</strong><br>Логин: <span id="savedPhone"></span><br>Пароль: <span id="savedPassword"></span></p>
+      <button class="btn btn-primary" onclick="window.resetClientForm()" style="margin-top:20px">📝 Создать ещё одну заявку</button>
+      <button class="btn" onclick="window.showClientLogin()" style="margin-top:10px">🔐 Войти в личный кабинет</button>
     </div>
   </div>
 
-  <div style="margin-top:30px;text-align:center;padding-top:20px;border-top:1px solid var(--border)">
-    <a href="#" onclick="window.showStaffLogin()" style="color:var(--text-muted);font-size:12px">🔐 Вход для сотрудников</a>
+  <div class="client-portal-footer">
+    <a href="#" onclick="window.showStaffLogin()">🔐 Вход для сотрудников</a>
+  </div>
+</div>
+
+<!-- ВХОД В ЛИЧНЫЙ КАБИНЕТ ЗАЯВИТЕЛЯ -->
+<div class="client-portal" id="clientLoginPortal" style="display:none">
+  <div style="text-align:center;margin-bottom:30px">
+    <div style="font-size:64px;margin-bottom:10px">🔐</div>
+    <h1>Вход в личный кабинет</h1>
+    <p style="color:var(--text-light);font-size:16px">Для заявителей</p>
+  </div>
+
+  <div class="client-form" style="max-width:500px;margin:0 auto">
+    <h2>Войти</h2>
+    <form onsubmit="window.clientLogin(event)">
+      <div class="form-group">
+        <label>Номер телефона (логин) *</label>
+        <input type="tel" id="clientLoginPhone" required placeholder="+79121234567">
+      </div>
+      <div class="form-group">
+        <label>Пароль *</label>
+        <input type="password" id="clientLoginPassword" required placeholder="Ваш пароль">
+      </div>
+      <button type="submit" class="btn btn-primary">Войти</button>
+    </form>
+    <div style="margin-top:20px;text-align:center">
+      <a href="#" onclick="window.showClientPortal()" style="color:var(--text-muted);font-size:13px">← Вернуться к созданию заявки</a>
+    </div>
+  </div>
+</div>
+
+<!-- ЛИЧНЫЙ КАБИНЕТ ЗАЯВИТЕЛЯ -->
+<div class="client-dashboard" id="clientDashboard" style="display:none">
+  <div class="client-dashboard-header">
+    <div>
+      <h2>Личный кабинет</h2>
+      <p style="color:var(--text-light);margin-top:5px"><span id="clientDashboardName"></span> | Договор: <span id="clientDashboardContract"></span></p>
+    </div>
+    <button class="btn btn-ghost" onclick="window.clientLogout()">🚪 Выйти</button>
+  </div>
+
+  <div id="clientTicketsList" class="client-tickets-list"></div>
+
+  <div id="clientTicketDetail" style="display:none">
+    <button class="btn btn-ghost" onclick="window.backToClientTickets()" style="margin-bottom:20px">← Назад к списку заявок</button>
+    <div id="clientTicketContent"></div>
   </div>
 </div>
 
@@ -382,7 +467,7 @@ tr:hover td { background: var(--bg); }
 
 <main class="main-content" id="appMain" style="display:none">
   <div class="page active" id="page-tickets">
-    <div class="topbar"><div class="topbar-title"> Заявки</div><div class="topbar-actions"><div class="search-global"><input type="text" id="globalSearch" placeholder="Поиск..." oninput="window.renderTickets()"></div><button class="btn btn-primary" onclick="window.openTicketModal()">+ Новая заявка</button></div></div>
+    <div class="topbar"><div class="topbar-title">📥 Заявки</div><div class="topbar-actions"><div class="search-global"><input type="text" id="globalSearch" placeholder="Поиск..." oninput="window.renderTickets()"></div><button class="btn btn-primary" onclick="window.openTicketModal()">+ Новая заявка</button></div></div>
     <div class="tickets-layout">
       <div class="tickets-list-panel">
         <div class="status-cards" id="statusCards"></div>
@@ -399,17 +484,16 @@ tr:hover td { background: var(--bg); }
     </div>
   </div>
   <div class="page" id="page-recurring"><div class="topbar"><div class="topbar-title">🔁 Повторяющиеся заявки</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openTicketModal()">+ Создать шаблон</button></div></div><div class="page-content"><div id="recurringList"></div></div></div>
-  <div class="page" id="page-dashboard"><div class="topbar"><div class="topbar-title"> Дашборд</div></div><div class="reports-content" id="dashboardContent"></div></div>
-  <div class="page" id="page-clients"><div class="topbar"><div class="topbar-title"> Заявители</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openClientModal()">+ Заявитель</button></div></div><div class="page-content"><div class="card"><table><thead><tr><th>Заявитель</th><th>Email</th><th>Телефон</th><th>Компания</th><th>Заявок</th><th>Действия</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div></div>
-  <div class="page" id="page-companies"><div class="topbar"><div class="topbar-title"> Компании</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openCompanyModal()">+ Компания</button></div></div><div class="page-content"><div class="card"><table><thead><tr><th>Компания</th><th>Домен</th><th>Заявителей</th><th>Заявок</th><th>Действия</th></tr></thead><tbody id="companiesTable"></tbody></table></div></div></div>
+  <div class="page" id="page-dashboard"><div class="topbar"><div class="topbar-title">📊 Дашборд</div></div><div class="reports-content" id="dashboardContent"></div></div>
+  <div class="page" id="page-clients"><div class="topbar"><div class="topbar-title">👥 Заявители</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openClientModal()">+ Заявитель</button></div></div><div class="page-content"><div class="card"><table><thead><tr><th>Заявитель</th><th>Email</th><th>Телефон</th><th>Договор</th><th>Заявок</th><th>Действия</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div></div>
+  <div class="page" id="page-companies"><div class="topbar"><div class="topbar-title">🏢 Компании</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openCompanyModal()">+ Компания</button></div></div><div class="page-content"><div class="card"><table><thead><tr><th>Компания</th><th>Домен</th><th>Заявителей</th><th>Заявок</th><th>Действия</th></tr></thead><tbody id="companiesTable"></tbody></table></div></div></div>
   <div class="page" id="page-staff"><div class="topbar"><div class="topbar-title">🧑‍💼 Сотрудники</div></div><div class="page-content"><div class="card"><table><thead><tr><th>Сотрудник</th><th>Телефон</th><th>Отдел</th><th>Роль</th><th>Открытых</th><th>Решено</th></tr></thead><tbody id="staffTable"></tbody></table></div></div></div>
   <div class="page" id="page-reports"><div class="topbar"><div class="topbar-title">📈 Отчёты</div></div><div class="reports-content" id="reportsContent"></div></div>
   <div class="page" id="page-departments"><div class="topbar"><div class="topbar-title">🏛 Отделы</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openDepartmentModal()">+ Отдел</button></div></div><div class="page-content"><div id="departmentsList"></div></div></div>
-  <div class="page" id="page-users"><div class="topbar"><div class="topbar-title">🔐 Пользователи</div></div><div class="page-content"><div style="margin-bottom:15px;padding:12px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;border-left:3px solid #f59e0b"> Режим администратора</div><div class="card"><table><thead><tr><th>ФИО</th><th>Телефон</th><th>Отдел</th><th>Роль</th><th>Пин-код</th><th>Создан</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></div>
+  <div class="page" id="page-users"><div class="topbar"><div class="topbar-title">🔐 Пользователи</div></div><div class="page-content"><div style="margin-bottom:15px;padding:12px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;border-left:3px solid #f59e0b">🔐 Режим администратора</div><div class="card"><table><thead><tr><th>ФИО</th><th>Телефон</th><th>Отдел</th><th>Роль</th><th>Пин-код</th><th>Создан</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></div>
   <div class="page" id="page-settings"><div class="topbar"><div class="topbar-title">⚙️ Настройки</div></div><div class="settings-layout"><div class="settings-nav"><div class="settings-nav-item active" data-settings="profile">Мой профиль</div><div class="settings-nav-item admin-only" data-settings="system">Система</div><div class="settings-nav-item admin-only" data-settings="categories">Категории</div><div class="settings-nav-item admin-only" data-settings="data">Данные</div></div><div class="settings-content" id="settingsContent"></div></div></div>
 </main>
 
-<!-- МОДАЛЬНЫЕ ОКНА (без изменений) -->
 <div class="modal" id="ticketViewModal">
   <div class="modal-content ticket-modal-content">
     <div class="ticket-modal-header">
@@ -421,8 +505,8 @@ tr:hover td { background: var(--bg); }
 </div>
 
 <div class="modal" id="ticketModal"><div class="modal-content large"><div class="modal-header"><div class="modal-title" id="ticketModalTitle">Новая заявка</div><button class="close-btn" onclick="window.closeModal('ticketModal')">&times;</button></div><div class="modal-body"><form id="ticketForm" onsubmit="window.saveTicket(event)"><input type="hidden" id="ticketId"><div class="form-group"><label>Тема *</label><input type="text" id="ticketSubject" required></div><div class="form-row"><div class="form-group"><label>Заявитель *</label><select id="ticketClient" required></select></div><div class="form-group"><label>Категория</label><select id="ticketCategory"></select></div></div><div class="form-row"><div class="form-group"><label>Приоритет</label><select id="ticketPriority"><option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option><option value="urgent">Срочный</option></select></div><div class="form-group"><label>Исполнитель</label><select id="ticketAssignee"></select></div></div><div class="form-group"><label>Описание *</label><textarea id="ticketDescription" required></textarea></div><div class="recurrence-section"><div class="recurrence-header"><label><input type="checkbox" id="recurrenceEnabled" onchange="window.toggleRecurrenceConfig()">🔁 Сделать повторяющейся</label></div><div class="recurrence-config" id="recurrenceConfig"><div class="recurrence-presets"><button type="button" onclick="window.setRecurrencePreset('hourly', 1)">Каждый час</button><button type="button" onclick="window.setRecurrencePreset('hourly', 4)">Каждые 4 часа</button><button type="button" onclick="window.setRecurrencePreset('daily', 1)">Ежедневно</button><button type="button" onclick="window.setRecurrencePreset('weekly', 1)">Еженедельно</button><button type="button" onclick="window.setRecurrencePreset('monthly', 1)">Ежемесячно</button></div><div class="recurrence-grid"><div class="form-group" style="margin-bottom:0"><label>Интервал</label><input type="number" id="recurrenceInterval" value="1" min="1"></div><div class="form-group" style="margin-bottom:0"><label>Период</label><select id="recurrencePeriod"><option value="hourly">Часы</option><option value="daily" selected>Дни</option><option value="weekly">Недели</option><option value="monthly">Месяцы</option></select></div></div><div class="form-group" style="margin-top:10px;margin-bottom:0"><label>Первое выполнение</label><input type="datetime-local" id="recurrenceFirstRun"></div><div class="form-row" style="margin-top:10px"><div class="form-group" style="margin-bottom:0"><label>Окончание</label><input type="datetime-local" id="recurrenceEndDate"></div><div class="form-group" style="margin-bottom:0"><label>Макс. кол-во</label><input type="number" id="recurrenceMaxCount" min="1" placeholder="∞"></div></div></div></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('ticketModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('ticketForm').requestSubmit()">Сохранить</button></div></div></div>
-<div class="modal" id="postponeModal"><div class="modal-content" style="max-width:480px"><div class="modal-header"><div class="modal-title"> Отложить</div><button class="close-btn" onclick="window.closeModal('postponeModal')">&times;</button></div><div class="modal-body"><div style="text-align:center;padding:10px 0"><div style="font-size:48px;margin-bottom:15px">⏸️</div><div style="font-size:14px;font-weight:500;margin-bottom:15px">Когда вернуться?</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:15px"><button class="btn btn-small" onclick="window.setPostponePreset(1)">1 час</button><button class="btn btn-small" onclick="window.setPostponePreset(4)">4 часа</button><button class="btn btn-small" onclick="window.setPostponePreset(24)">Завтра</button><button class="btn btn-small" onclick="window.setPostponePreset(168)">Неделя</button></div><input type="datetime-local" id="postponeDate" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;background:var(--card);color:var(--text)"><div style="margin-top:12px"><textarea id="postponeReason" placeholder="Причина" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;min-height:60px;background:var(--card);color:var(--text)"></textarea></div></div></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('postponeModal')">Отмена</button><button class="btn btn-warning" onclick="window.confirmPostpone()" style="color:white">⏸ Отложить</button></div></div></div>
-<div class="modal" id="clientModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="clientModalTitle">Новый заявитель</div><button class="close-btn" onclick="window.closeModal('clientModal')">&times;</button></div><div class="modal-body"><form id="clientForm" onsubmit="window.saveClient(event)"><input type="hidden" id="clientId"><div class="form-group"><label>Имя *</label><input type="text" id="clientName" required></div><div class="form-row"><div class="form-group"><label>Email *</label><input type="email" id="clientEmail" required></div><div class="form-group"><label>Телефон</label><input type="tel" id="clientPhone"></div></div><div class="form-group"><label>Компания</label><select id="clientCompany"></select></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('clientModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('clientForm').requestSubmit()">Сохранить</button></div></div></div>
+<div class="modal" id="postponeModal"><div class="modal-content" style="max-width:480px"><div class="modal-header"><div class="modal-title">⏸ Отложить</div><button class="close-btn" onclick="window.closeModal('postponeModal')">&times;</button></div><div class="modal-body"><div style="text-align:center;padding:10px 0"><div style="font-size:48px;margin-bottom:15px">⏸️</div><div style="font-size:14px;font-weight:500;margin-bottom:15px">Когда вернуться?</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:15px"><button class="btn btn-small" onclick="window.setPostponePreset(1)">1 час</button><button class="btn btn-small" onclick="window.setPostponePreset(4)">4 часа</button><button class="btn btn-small" onclick="window.setPostponePreset(24)">Завтра</button><button class="btn btn-small" onclick="window.setPostponePreset(168)">Неделя</button></div><input type="datetime-local" id="postponeDate" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;background:var(--card);color:var(--text)"><div style="margin-top:12px"><textarea id="postponeReason" placeholder="Причина" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;min-height:60px;background:var(--card);color:var(--text)"></textarea></div></div></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('postponeModal')">Отмена</button><button class="btn btn-warning" onclick="window.confirmPostpone()" style="color:white">⏸ Отложить</button></div></div></div>
+<div class="modal" id="clientModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="clientModalTitle">Новый заявитель</div><button class="close-btn" onclick="window.closeModal('clientModal')">&times;</button></div><div class="modal-body"><form id="clientForm" onsubmit="window.saveClient(event)"><input type="hidden" id="clientId"><div class="form-group"><label>Имя *</label><input type="text" id="clientName" required></div><div class="form-row"><div class="form-group"><label>Email *</label><input type="email" id="clientEmail" required></div><div class="form-group"><label>Телефон</label><input type="tel" id="clientPhone"></div></div><div class="form-group"><label>Номер договора</label><input type="text" id="clientContract"></div><div class="form-group"><label>Компания</label><select id="clientCompany"></select></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('clientModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('clientForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="modal" id="companyModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="companyModalTitle">Новая компания</div><button class="close-btn" onclick="window.closeModal('companyModal')">&times;</button></div><div class="modal-body"><form id="companyForm" onsubmit="window.saveCompany(event)"><input type="hidden" id="companyId"><div class="form-group"><label>Название *</label><input type="text" id="companyName" required></div><div class="form-group"><label>Домен</label><input type="text" id="companyDomain"></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('companyModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('companyForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="modal" id="departmentModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="departmentModalTitle">Новый отдел</div><button class="close-btn" onclick="window.closeModal('departmentModal')">&times;</button></div><div class="modal-body"><form id="departmentForm" onsubmit="window.saveDepartment(event)"><input type="hidden" id="departmentId"><div class="form-group"><label>Название *</label><input type="text" id="departmentName" required></div><div class="form-group"><label>Описание</label><textarea id="departmentDescription"></textarea></div><div class="form-group"><label>Цвет</label><input type="color" id="departmentColor" value="#10b981" style="height:40px;cursor:pointer"></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('departmentModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('departmentForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="modal" id="userModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="userModalTitle">Редактировать</div><button class="close-btn" onclick="window.closeModal('userModal')">&times;</button></div><div class="modal-body"><form id="userForm" onsubmit="window.saveUser(event)"><input type="hidden" id="userId"><div class="form-group"><label>ФИО *</label><input type="text" id="userFullName" required></div><div class="form-group"><label>Телефон *</label><input type="tel" id="userPhone" required></div><div class="form-group"><label>Отдел</label><select id="userDepartment"></select></div><div class="form-group"><label>Роль</label><select id="userRole"><option value="staff">Сотрудник</option><option value="admin">Администратор</option></select></div><div class="form-group"><label>Новый пин-код (4 цифры)</label><input type="password" id="userPin" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('userModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('userForm').requestSubmit()">Сохранить</button></div></div></div>
@@ -453,10 +537,12 @@ let state = {
   tickets: JSON.parse(localStorage.getItem('hd_tickets')) || [], 
   categories: JSON.parse(localStorage.getItem('hd_categories')) || [], 
   settings: JSON.parse(localStorage.getItem('hd_settings')) || { theme: 'light', companyName: 'Ярмарка CRM', autoArchiveHours: 24, soundEnabled: true, defaultAssigneeId: '' }, 
-  session: JSON.parse(localStorage.getItem('hd_session')) || null 
+  session: JSON.parse(localStorage.getItem('hd_session')) || null,
+  clientSession: JSON.parse(localStorage.getItem('hd_client_session')) || null
 };
 
 let CURRENT_USER_ID = null, selectedTicketId = null, currentFilter = 'new', postponeTicketId = null, selectedLoginUserId = null;
+let CURRENT_CLIENT_ID = null;
 const STATUS_LABELS = { new: 'Новая', open: 'В работе', pending: 'Ожидание', solved: 'Решена', closed: 'Архив' };
 const PRIORITY_LABELS = { low: 'Низкий', medium: 'Средний', high: 'Высокий', urgent: 'Срочный' };
 const ROLE_LABELS = { admin: 'Администратор', staff: 'Сотрудник' };
@@ -499,7 +585,7 @@ async function loadFromFirebase() {
 function seedData() {
   console.log('🌱 Создаём демо-данные...');
   state.departments = [{ id: 'dep1', name: 'Техническая поддержка', description: 'Решение технических вопросов', color: '#10b981', createdAt: new Date().toISOString() }, { id: 'dep2', name: 'Отдел продаж', description: 'Работа с клиентами', color: '#3b82f6', createdAt: new Date().toISOString() }];
-  state.users = [{ id: 'user-admin', fullName: 'Администратор Системы', phone: '+7 900 000-00-00', pin: '1408', role: 'admin', departmentId: 'dep1', createdAt: new Date().toISOString() }, { id: 'user-2', fullName: 'Петров Сергей', phone: '+7 900 111-11-11', pin: '1111', role: 'staff', departmentId: 'dep1', createdAt: new Date().toISOString() }];
+  state.users = [{ id: 'user-admin', fullName: 'Администратор Системы', phone: '+79000000000', pin: '1408', role: 'admin', departmentId: 'dep1', createdAt: new Date().toISOString() }, { id: 'user-2', fullName: 'Петров Сергей', phone: '+79001111111', pin: '1111', role: 'staff', departmentId: 'dep1', createdAt: new Date().toISOString() }];
   state.categories = [{ id: 'cat1', name: 'Тех. поддержка', color: '#10b981' }, { id: 'cat2', name: 'Продажи', color: '#059669' }, { id: 'cat3', name: 'Оплата', color: '#f59e0b' }];
   state.settings.defaultAssigneeId = 'user-admin';
 }
@@ -514,6 +600,8 @@ function save() {
   localStorage.setItem('hd_settings', JSON.stringify(state.settings));
   if (state.session) localStorage.setItem('hd_session', JSON.stringify(state.session));
   else localStorage.removeItem('hd_session');
+  if (state.clientSession) localStorage.setItem('hd_client_session', JSON.stringify(state.clientSession));
+  else localStorage.removeItem('hd_client_session');
   saveToFirebase();
 }
 
@@ -523,6 +611,7 @@ function getCompany(id) { return state.companies.find(c => c.id === id); }
 function getCategory(id) { return state.categories.find(c => c.id === id); }
 function getDepartment(id) { return state.departments.find(d => d.id === id); }
 function getCurrentUser() { return getUser(CURRENT_USER_ID); }
+function getCurrentClient() { return getClient(CURRENT_CLIENT_ID); }
 function isAdmin() { const u = getCurrentUser(); return u && u.role === 'admin'; }
 function getInitials(name) { if (!name) return '?'; const parts = name.split(' ').filter(Boolean); if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase(); return parts[0].slice(0, 2).toUpperCase(); }
 function formatDate(iso) { if (!iso) return '—'; const d = new Date(iso); const diff = (Date.now() - d) / 1000; if (diff < 60) return 'только что'; if (diff < 3600) return Math.floor(diff/60) + ' мин'; if (diff < 86400) return Math.floor(diff/3600) + ' ч'; if (diff < 86400*7) return Math.floor(diff/86400) + ' дн'; return d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short' }); }
@@ -531,96 +620,6 @@ function toast(msg, type) { const t = document.getElementById('toast'); t.textCo
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 document.querySelectorAll('.modal').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); }); });
-
-// ✅ ФУНКЦИЯ СОЗДАНИЯ ЗАЯВКИ ЗАЯВИТЕЛЕМ
-window.createPublicTicket = async function(e) {
-  e.preventDefault();
-  
-  const name = document.getElementById('publicClientName').value.trim();
-  const phone = document.getElementById('publicClientPhone').value.trim();
-  const email = document.getElementById('publicClientEmail').value.trim();
-  const subject = document.getElementById('publicTicketSubject').value.trim();
-  const category = document.getElementById('publicTicketCategory').value;
-  const priority = document.getElementById('publicTicketPriority').value;
-  const description = document.getElementById('publicTicketDescription').value.trim();
-  
-  if (!name || !phone || !subject || !description) {
-    toast('Заполните обязательные поля', 'error');
-    return;
-  }
-  
-  // Ищем или создаём заявителя
-  let client = state.clients.find(c => c.phone === phone || c.email === email);
-  if (!client) {
-    client = {
-      id: 'c' + Date.now(),
-      name: name,
-      email: email,
-      phone: phone,
-      companyId: null,
-      createdAt: new Date().toISOString()
-    };
-    state.clients.push(client);
-  }
-  
-  // Получаем ответственного из настроек
-  const defaultAssigneeId = state.settings.defaultAssigneeId || '';
-  
-  // Создаём заявку
-  const maxNum = state.tickets.reduce((m, t) => Math.max(m, parseInt(t.number.replace('HD-', ''))), 1000);
-  const newTicket = {
-    id: 't' + Date.now(),
-    number: 'HD-' + (maxNum + 1),
-    subject: subject,
-    description: description,
-    clientId: client.id,
-    category: category,
-    priority: priority,
-    status: 'new',
-    assigneeId: defaultAssigneeId || null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    resolvedAt: null,
-    recurrence: null,
-    recurringParentId: null,
-    comments: [{
-      id: 'cm' + Date.now(),
-      authorId: client.id,
-      authorType: 'client',
-      text: description,
-      createdAt: new Date().toISOString()
-    }],
-    history: [{
-      action: 'created',
-      at: new Date().toISOString(),
-      by: 'public',
-      details: 'Заявка создана заявителем'
-    }]
-  };
-  
-  state.tickets.push(newTicket);
-  save();
-  
-  // Показываем успешное сообщение
-  document.getElementById('clientFormSection').style.display = 'none';
-  document.getElementById('clientSuccessSection').style.display = 'block';
-  document.getElementById('createdTicketNumber').textContent = newTicket.number;
-  
-  toast('✅ Заявка создана!');
-};
-
-window.resetClientForm = function() {
-  document.getElementById('publicTicketForm').reset();
-  document.getElementById('clientFormSection').style.display = 'block';
-  document.getElementById('clientSuccessSection').style.display = 'none';
-};
-
-window.showStaffLogin = function() {
-  document.getElementById('clientPortal').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  renderUserPicker();
-  renderRegDepartments();
-};
 
 function formatRecurrence(rec) { if (!rec || !rec.enabled) return ''; const periodText = PERIOD_FULL[rec.period] || rec.period; if (rec.interval === 1) { if (rec.period === 'hourly') return 'Каждый час'; if (rec.period === 'daily') return 'Ежедневно'; if (rec.period === 'weekly') return 'Еженедельно'; if (rec.period === 'monthly') return 'Ежемесячно'; } return 'Каждые ' + rec.interval + ' ' + periodText; }
 function calculateNextRun(rec, fromDate) { const from = new Date(fromDate || rec.lastRunAt || rec.firstRunAt || Date.now()); const next = new Date(from); switch (rec.period) { case 'hourly': next.setHours(next.getHours() + rec.interval); break; case 'daily': next.setDate(next.getDate() + rec.interval); break; case 'weekly': next.setDate(next.getDate() + rec.interval * 7); break; case 'monthly': next.setMonth(next.getMonth() + rec.interval); break; } return next.toISOString(); }
@@ -689,9 +688,341 @@ function updateAllCounters() {
   }
 }
 
-async function checkAuth() {
+// ✅ ФУНКЦИИ ДЛЯ ЗАЯВИТЕЛЕЙ
+
+// Проверка формата телефона
+function normalizePhone(phone) {
+  // Убираем все кроме цифр
+  let digits = phone.replace(/\D/g, '');
+  // Если начинается с 8, заменяем на 7
+  if (digits.startsWith('8')) digits = '7' + digits.substring(1);
+  // Если не начинается с 7, добавляем 7
+  if (!digits.startsWith('7')) digits = '7' + digits;
+  // Возвращаем в формате +7...
+  return '+' + digits;
+}
+
+// Создание заявки заявителем
+window.createPublicTicket = async function(e) {
+  e.preventDefault();
+  
+  const name = document.getElementById('publicClientName').value.trim();
+  const phone = document.getElementById('publicClientPhone').value.trim();
+  const email = document.getElementById('publicClientEmail').value.trim();
+  const contractNumber = document.getElementById('publicContractNumber').value.trim();
+  const password = document.getElementById('publicClientPassword').value;
+  const subject = document.getElementById('publicTicketSubject').value.trim();
+  const category = document.getElementById('publicTicketCategory').value;
+  const priority = document.getElementById('publicTicketPriority').value;
+  const description = document.getElementById('publicTicketDescription').value.trim();
+  
+  if (!name || !phone || !contractNumber || !subject || !description) {
+    toast('Заполните все обязательные поля', 'error');
+    return;
+  }
+  
+  // Нормализуем телефон
+  const normalizedPhone = normalizePhone(phone);
+  
+  // Ищем заявителя по телефону
+  let client = state.clients.find(c => c.phone === normalizedPhone);
+  let isNewClient = false;
+  
+  if (!client) {
+    // Новый заявитель - требуем пароль
+    if (!password || password.length < 4) {
+      toast('Придумайте пароль (минимум 4 символа)', 'error');
+      return;
+    }
+    
+    isNewClient = true;
+    client = {
+      id: 'c' + Date.now(),
+      name: name,
+      email: email,
+      phone: normalizedPhone,
+      password: password, // В реальном проекте нужно хешировать!
+      contractNumber: contractNumber,
+      companyId: null,
+      createdAt: new Date().toISOString()
+    };
+    state.clients.push(client);
+  } else {
+    // Существующий заявитель - проверяем пароль
+    if (client.password !== password) {
+      toast('Неверный пароль. Используйте пароль, который вы указали при первой заявке.', 'error');
+      return;
+    }
+    // Обновляем данные если изменились
+    if (name) client.name = name;
+    if (email) client.email = email;
+    if (contractNumber) client.contractNumber = contractNumber;
+  }
+  
+  // Получаем ответственного из настроек
+  const defaultAssigneeId = state.settings.defaultAssigneeId || '';
+  
+  // Создаём заявку
+  const maxNum = state.tickets.reduce((m, t) => Math.max(m, parseInt(t.number.replace('HD-', ''))), 1000);
+  const newTicket = {
+    id: 't' + Date.now(),
+    number: 'HD-' + (maxNum + 1),
+    subject: subject,
+    description: description,
+    clientId: client.id,
+    contractNumber: contractNumber,
+    category: category,
+    priority: priority,
+    status: 'new',
+    assigneeId: defaultAssigneeId || null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    resolvedAt: null,
+    recurrence: null,
+    recurringParentId: null,
+    comments: [{
+      id: 'cm' + Date.now(),
+      authorId: client.id,
+      authorType: 'client',
+      text: description,
+      createdAt: new Date().toISOString()
+    }],
+    history: [{
+      action: 'created',
+      at: new Date().toISOString(),
+      by: 'public',
+      details: 'Заявка создана заявителем' + (isNewClient ? ' (новая регистрация)' : '')
+    }]
+  };
+  
+  state.tickets.push(newTicket);
+  save();
+  
+  // Показываем успешное сообщение
+  document.getElementById('clientFormSection').style.display = 'none';
+  document.getElementById('clientSuccessSection').style.display = 'block';
+  document.getElementById('createdTicketNumber').textContent = newTicket.number;
+  document.getElementById('savedPhone').textContent = normalizedPhone;
+  document.getElementById('savedPassword').textContent = isNewClient ? password : '••••••';
+  
+  toast('✅ Заявка создана!');
+};
+
+window.resetClientForm = function() {
+  document.getElementById('publicTicketForm').reset();
+  document.getElementById('clientFormSection').style.display = 'block';
+  document.getElementById('clientSuccessSection').style.display = 'none';
+  document.getElementById('passwordField').style.display = 'none';
+};
+
+window.showClientLogin = function() {
+  document.getElementById('clientPortal').style.display = 'none';
+  document.getElementById('clientLoginPortal').style.display = 'block';
+};
+
+window.showClientPortal = function() {
+  document.getElementById('clientLoginPortal').style.display = 'none';
+  document.getElementById('clientPortal').style.display = 'block';
+};
+
+// Вход в личный кабинет заявителя
+window.clientLogin = function(e) {
+  e.preventDefault();
+  
+  const phone = document.getElementById('clientLoginPhone').value.trim();
+  const password = document.getElementById('clientLoginPassword').value;
+  
+  const normalizedPhone = normalizePhone(phone);
+  const client = state.clients.find(c => c.phone === normalizedPhone);
+  
+  if (!client) {
+    toast('Заявитель не найден. Проверьте номер телефона.', 'error');
+    return;
+  }
+  
+  if (client.password !== password) {
+    toast('Неверный пароль.', 'error');
+    return;
+  }
+  
+  CURRENT_CLIENT_ID = client.id;
+  state.clientSession = { clientId: client.id, loginAt: new Date().toISOString() };
+  save();
+  
+  toast('👋 Добро пожаловать, ' + client.name + '!');
+  showClientDashboard();
+};
+
+// Показать личный кабинет заявителя
+function showClientDashboard() {
+  document.getElementById('clientPortal').style.display = 'none';
+  document.getElementById('clientLoginPortal').style.display = 'none';
+  document.getElementById('clientDashboard').style.display = 'block';
+  
+  const client = getCurrentClient();
+  if (client) {
+    document.getElementById('clientDashboardName').textContent = client.name;
+    document.getElementById('clientDashboardContract').textContent = client.contractNumber || 'Не указан';
+  }
+  
+  renderClientTickets();
+}
+
+// Список заявок заявителя
+function renderClientTickets() {
+  const client = getCurrentClient();
+  if (!client) return;
+  
+  const clientTickets = state.tickets.filter(t => t.clientId === client.id);
+  const list = document.getElementById('clientTicketsList');
+  
+  if (clientTickets.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>У вас пока нет заявок</p></div>';
+    return;
+  }
+  
+  list.innerHTML = clientTickets.map(t => {
+    const assignee = getUser(t.assigneeId);
+    return '<div class="client-ticket-card" onclick="window.openClientTicket(\'' + t.id + '\')">' +
+      '<div class="client-ticket-header">' +
+        '<span class="client-ticket-number">' + t.number + '</span>' +
+        '<span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' +
+      '</div>' +
+      '<div class="client-ticket-subject">' + t.subject + '</div>' +
+      '<div class="client-ticket-meta">' +
+        '<span>📅 ' + formatDate(t.createdAt) + '</span>' +
+        (assignee ? '<span>👤 ' + assignee.fullName + '</span>' : '') +
+        '<span>💬 ' + t.comments.length + ' сообщений</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  
+  document.getElementById('clientTicketsList').style.display = 'flex';
+  document.getElementById('clientTicketDetail').style.display = 'none';
+}
+
+// Открыть заявку заявителя
+window.openClientTicket = function(ticketId) {
+  const t = state.tickets.find(x => x.id === ticketId);
+  if (!t) return;
+  
+  const client = getCurrentClient();
+  if (t.clientId !== client.id) {
+    toast('У вас нет доступа к этой заявке', 'error');
+    return;
+  }
+  
+  selectedTicketId = ticketId;
+  renderClientTicketDetail(t);
+};
+
+// Детали заявки для заявителя
+function renderClientTicketDetail(t) {
+  const assignee = getUser(t.assigneeId);
+  const isResolved = t.status === 'solved' || t.status === 'closed';
+  
+  let html = '<div class="card" style="padding:20px;margin-bottom:20px">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px">';
+  html += '<div><span style="font-family:monospace;color:var(--text-muted)">' + t.number + '</span> <span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span></div>';
+  html += '<div style="font-size:12px;color:var(--text-light)">📅 ' + formatDateTime(t.createdAt) + '</div>';
+  html += '</div>';
+  html += '<h3 style="margin-bottom:15px">' + t.subject + '</h3>';
+  html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:15px">' + t.description + '</div>';
+  if (assignee) {
+    html += '<div style="font-size:13px;color:var(--text-light)">👤 Исполнитель: <strong>' + assignee.fullName + '</strong></div>';
+  }
+  html += '</div>';
+  
+  // Чат
+  html += '<div class="client-chat">';
+  html += '<div class="client-chat-header">💬 Переписка (' + t.comments.length + ')</div>';
+  html += '<div class="client-chat-messages" id="clientChatMessages">';
+  
+  const messagesHtml = t.comments.map(c => {
+    let authorName = '', cls = '';
+    if (c.authorType === 'system') { authorName = '🤖 Система'; cls = 'message-system'; }
+    else if (c.authorType === 'client') { authorName = '👤 Вы'; cls = 'message-client'; }
+    else { const u = getUser(c.authorId); authorName = '🧑‍💼 ' + (u ? u.fullName : 'Исполнитель'); cls = 'message-agent'; }
+    return '<div class="message ' + cls + '"><div class="message-header"><span class="message-author">' + authorName + '</span><span class="message-time">' + formatDateTime(c.createdAt) + '</span></div><div class="message-body">' + c.text + '</div></div>';
+  }).join('');
+  
+  html += messagesHtml;
+  html += '</div>';
+  
+  if (!isResolved) {
+    html += '<div class="client-chat-input">';
+    html += '<textarea id="clientReplyText" placeholder="Напишите сообщение..."></textarea>';
+    html += '<button class="btn btn-primary" onclick="window.sendClientReply(\'' + t.id + '\')">Отправить</button>';
+    html += '</div>';
+  }
+  
+  html += '</div>';
+  
+  document.getElementById('clientTicketContent').innerHTML = html;
+  document.getElementById('clientTicketsList').style.display = 'none';
+  document.getElementById('clientTicketDetail').style.display = 'block';
+}
+
+// Отправить сообщение от заявителя
+window.sendClientReply = function(ticketId) {
+  const text = document.getElementById('clientReplyText').value.trim();
+  if (!text) { toast('Введите текст', 'error'); return; }
+  
+  const t = state.tickets.find(x => x.id === ticketId);
+  if (!t) return;
+  
+  const client = getCurrentClient();
+  t.comments.push({
+    id: 'cm' + Date.now(),
+    authorId: client.id,
+    authorType: 'client',
+    text: text,
+    createdAt: new Date().toISOString()
+  });
+  t.updatedAt = new Date().toISOString();
+  if (t.status === 'new') t.status = 'open';
+  
+  save();
+  toast('Сообщение отправлено');
+  renderClientTicketDetail(t);
+};
+
+window.backToClientTickets = function() {
+  document.getElementById('clientTicketsList').style.display = 'flex';
+  document.getElementById('clientTicketDetail').style.display = 'none';
+  selectedTicketId = null;
+};
+
+window.clientLogout = function() {
+  if (!confirm('Выйти из личного кабинета?')) return;
+  CURRENT_CLIENT_ID = null;
+  state.clientSession = null;
+  save();
+  document.getElementById('clientDashboard').style.display = 'none';
+  document.getElementById('clientPortal').style.display = 'block';
+};
+
+// Показывать поле пароля только для новых заявителей
+document.addEventListener('input', function(e) {
+  if (e.target.id === 'publicClientPhone') {
+    const phone = e.target.value.trim();
+    const normalizedPhone = normalizePhone(phone);
+    const existingClient = state.clients.find(c => c.phone === normalizedPhone);
+    
+    const passwordField = document.getElementById('passwordField');
+    if (existingClient) {
+      passwordField.style.display = 'none';
+      document.getElementById('publicClientPassword').required = false;
+    } else {
+      passwordField.style.display = 'block';
+      document.getElementById('publicClientPassword').required = true;
+    }
+  }
+});
+
+// Остальные функции CRM...
+function checkAuth() {
   console.log('🔐 Проверка авторизации...');
-  console.log(' Пользователей в базе:', state.users.length);
   if (state.session && state.session.userId) {
     const user = getUser(state.session.userId);
     if (user) {
@@ -716,7 +1047,6 @@ function hideLoginError(id) { document.getElementById(id).classList.remove('show
 
 function renderUserPicker() { 
     const picker = document.getElementById('userPicker'); 
-    console.log('📋 Пользователей в системе:', state.users.length);
     if (state.users.length === 0) { picker.innerHTML = '<div style="padding:15px;text-align:center;color:var(--text-muted);font-size:12px">Нет зарегистрированных сотрудников</div>'; return; } 
     picker.innerHTML = state.users.map(u => { 
         const dep = getDepartment(u.departmentId); 
@@ -727,19 +1057,17 @@ function renderUserPicker() {
 function selectLoginUser(id) { selectedLoginUserId = id; renderUserPicker(); document.getElementById('loginPin').focus(); }
 
 async function doLogin() { 
-    console.log('🔑 doLogin вызван');
     hideLoginError('loginError'); 
     if (!selectedLoginUserId) { showLoginError('loginError', 'Выберите сотрудника'); return; } 
     const pin = document.getElementById('loginPin').value; 
     if (!/^\d{4}$/.test(pin)) { showLoginError('loginError', 'Пин-код должен содержать 4 цифры'); return; } 
     const user = getUser(selectedLoginUserId); 
-    console.log('🔍 Пользователь:', user ? user.fullName : 'НЕ НАЙДЕН', 'Пин:', user ? user.pin : '—', 'Введён:', pin);
     if (!user) { showLoginError('loginError', 'Пользователь не найден. Обновите страницу.'); return; } 
     if (user.pin !== pin) { showLoginError('loginError', 'Неверный пин-код'); return; } 
     CURRENT_USER_ID = user.id; 
     state.session = { userId: user.id, loginAt: new Date().toISOString() }; 
     save(); 
-    toast(' Добро пожаловать, ' + user.fullName.split(' ')[0] + '!'); 
+    toast('👋 Добро пожаловать, ' + user.fullName.split(' ')[0] + '!'); 
     showApp(); 
 }
 
@@ -771,6 +1099,15 @@ document.addEventListener('input', e => { if (e.target.classList && e.target.cla
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') { if (document.getElementById('loginForm').classList.contains('active')) doLogin(); else if (document.getElementById('registerForm').classList.contains('active')) doRegister(); } if (e.key === 'Escape' && document.getElementById('ticketViewModal')?.classList.contains('active')) { closeTicketModal(); } });
 
 document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active'); const page = item.dataset.page; document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-' + page).classList.add('active'); if (page === 'dashboard') renderDashboard(); if (page === 'clients') renderClients(); if (page === 'companies') renderCompanies(); if (page === 'staff') renderStaff(); if (page === 'reports') renderReports(); if (page === 'tickets') renderTickets(); if (page === 'recurring') renderRecurring(); if (page === 'departments') renderDepartments(); if (page === 'users') renderUsers(); if (page === 'settings') renderSettings(); }); });
+
+window.showStaffLogin = function() {
+  document.getElementById('clientPortal').style.display = 'none';
+  document.getElementById('clientLoginPortal').style.display = 'none';
+  document.getElementById('clientDashboard').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  renderUserPicker();
+  renderRegDepartments();
+};
 
 function openPostponeModal(id) {
     const t = state.tickets.find(x => x.id === id);
@@ -824,7 +1161,7 @@ function renderStatusCards() {
   
   const cards = [
     { id: 'new', label: 'Новые', count: newCount, icon: '🆕' },
-    { id: 'mine', label: 'Мои', count: mine, icon: '' },
+    { id: 'mine', label: 'Мои', count: mine, icon: '👤' },
     { id: 'all', label: 'Все', count: all, icon: '📋' },
     { id: 'open', label: 'В работе', count: open, icon: '⚙️' },
     { id: 'pending', label: 'Ожидание', count: pending, icon: '⏸' },
@@ -905,7 +1242,7 @@ function renderTickets() {
         const preview = lastComment ? lastComment.text : t.description; 
         const isRecurringTemplate = t.recurrence && t.recurrence.enabled; 
         const isRecurringInstance = t.recurringParentId; 
-        return '<div class="ticket-item ' + (isRecurringTemplate ? 'is-recurring-template' : '') + '" onclick="window.selectTicket(\'' + t.id + '\')"><div class="ticket-priority-bar priority-' + t.priority + '"></div><div class="ticket-content"><div class="ticket-header"><span class="ticket-number">' + (isRecurringTemplate?'🔁 ':'') + (isRecurringInstance?'📄 ':'') + t.number + '</span><span class="ticket-time">' + formatDate(t.updatedAt) + '</span></div><div class="ticket-subject">' + t.subject + '</div><div class="ticket-preview">' + preview + '</div><div class="ticket-meta"><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (cat ? '<span style="font-size:10px;color:' + cat.color + '">● ' + cat.name + '</span>' : '') + (isRecurringTemplate ? '<span class="recurring-indicator"> ' + formatRecurrence(t.recurrence) + '</span>' : '') + (isRecurringInstance ? '<span class="recurring-indicator" style="background:#f3e8ff;color:#6b21a8">📄 Экземпляр</span>' : '') + (assignee ? '<span style="font-size:10px;color:var(--text-light)">‍💼 ' + assignee.fullName.split(' ')[0] + (dep ? ' <span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '</span>' : '<span style="font-size:10px;color:var(--warning)">⚠ Не назначен</span>') + (client ? '<span style="font-size:10px;color:var(--text-light)"> ' + client.name + '</span>' : '') + '</div></div></div>'; 
+        return '<div class="ticket-item ' + (isRecurringTemplate ? 'is-recurring-template' : '') + '" onclick="window.selectTicket(\'' + t.id + '\')"><div class="ticket-priority-bar priority-' + t.priority + '"></div><div class="ticket-content"><div class="ticket-header"><span class="ticket-number">' + (isRecurringTemplate?'🔁 ':'') + (isRecurringInstance?'📄 ':'') + t.number + '</span><span class="ticket-time">' + formatDate(t.updatedAt) + '</span></div><div class="ticket-subject">' + t.subject + '</div><div class="ticket-preview">' + preview + '</div><div class="ticket-meta"><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (cat ? '<span style="font-size:10px;color:' + cat.color + '">● ' + cat.name + '</span>' : '') + (isRecurringTemplate ? '<span class="recurring-indicator">🔁 ' + formatRecurrence(t.recurrence) + '</span>' : '') + (isRecurringInstance ? '<span class="recurring-indicator" style="background:#f3e8ff;color:#6b21a8">📄 Экземпляр</span>' : '') + (assignee ? '<span style="font-size:10px;color:var(--text-light)">🧑‍💼 ' + assignee.fullName.split(' ')[0] + (dep ? ' <span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '</span>' : '<span style="font-size:10px;color:var(--warning)">⚠ Не назначен</span>') + (client ? '<span style="font-size:10px;color:var(--text-light)">👤 ' + client.name + '</span>' : '') + '</div></div></div>'; 
     }).join(''); 
 }
 
@@ -930,7 +1267,7 @@ function openTicketViewModal(t) {
         actionsHtml += '<button class="btn btn-resolve" onclick="window.resolveTicketFromModal(\'' + t.id + '\')">✅ Выполнено</button>';
         actionsHtml += '<button class="btn btn-postpone" onclick="window.openPostponeModal(\'' + t.id + '\')">⏸ Отложить</button>';
     } else {
-        actionsHtml += '<button class="btn btn-info" onclick="window.reopenTicketFromModal(\'' + t.id + '\')"> Открыть заново</button>';
+        actionsHtml += '<button class="btn btn-info" onclick="window.reopenTicketFromModal(\'' + t.id + '\')">🔓 Открыть заново</button>';
     }
     if (isAdmin()) {
         actionsHtml += '<button class="btn btn-danger" onclick="window.deleteTicketFromModal(\'' + t.id + '\')">🗑️ Удалить</button>';
@@ -961,7 +1298,7 @@ function openTicketViewModal(t) {
         return '<div class="message ' + cls + '"><div class="message-header"><span class="message-author">' + authorName + '</span><span class="message-time">' + formatDateTime(c.createdAt) + '</span></div><div class="message-body">' + c.text + '</div></div>';
     }).join('');
 
-    const bodyHtml = bannerHtml + '<div><div class="conversation"><div class="conversation-title">💬 Переписка (' + t.comments.length + ')</div><div class="message message-client"><div class="message-header"><span class="message-author">📩 От ' + (client ? client.name : 'заявителя') + '</span><span class="message-time">' + formatDateTime(t.createdAt) + '</span></div><div class="message-body">' + t.description + '</div></div>' + messagesHtml + (!isResolved ? '<div class="reply-box"><textarea id="replyText" placeholder="Ответ заявителю..."></textarea><div class="reply-actions"><button class="btn btn-primary" onclick="window.sendReplyFromModal(\'' + t.id + '\')">Отправить</button></div></div>' : '') + '</div></div><div><div class="info-card" style="margin-bottom:12px"><div class="info-card-title">Заявитель</div>' + (client ? '<div class="client-card"><div class="client-avatar">' + getInitials(client.name) + '</div><div class="client-info"><div class="client-name">' + client.name + '</div><div class="client-email">' + client.email + '</div>' + (client.phone ? '<div class="client-email">' + client.phone + '</div>' : '') + '</div></div>' + (company ? '<div style="font-size:11px;color:var(--text-light);margin-top:5px">🏢 ' + company.name + '</div>' : '') : '<div style="color:var(--text-muted);font-size:12px">Не указан</div>') + '</div><div class="info-card"><div class="info-card-title">Свойства</div><div class="info-row"><span class="info-row-label">Статус</span><select onchange="window.updateTicketField(\'' + t.id + '\',\'status\',this.value);window.refreshTicketModal()">' + Object.entries(STATUS_LABELS).map(([k,v]) => '<option value="' + k + '" ' + (t.status===k?'selected':'') + '>' + v + '</option>').join('') + '</select></div><div class="info-row"><span class="info-row-label">Приоритет</span><select onchange="window.updateTicketField(\'' + t.id + '\',\'priority\',this.value);window.refreshTicketModal()">' + Object.entries(PRIORITY_LABELS).map(([k,v]) => '<option value="' + k + '" ' + (t.priority===k?'selected':'') + '>' + v + '</option>').join('') + '</select></div><div class="info-row"><span class="info-row-label">Исполнитель</span><select onchange="window.updateTicketField(\'' + t.id + '\',\'assigneeId\',this.value);window.refreshTicketModal()"><option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (t.assigneeId===u.id?'selected':'') + '>' + u.fullName + '</option>').join('') + '</select></div><div class="info-row"><span class="info-row-label">Категория</span><select onchange="window.updateTicketField(\'' + t.id + '\',\'category\',this.value);window.refreshTicketModal()">' + state.categories.map(c => '<option value="' + c.id + '" ' + (t.category===c.id?'selected':'') + '>' + c.name + '</option>').join('') + '</select></div></div>' + (isRecurringTemplate ? '<div class="info-card" style="margin-top:12px;background:linear-gradient(135deg, #f5f3ff, #ede9fe);border-color:#c4b5fd"><div class="info-card-title" style="color:#6b21a8">🔁 Повторение</div><div style="font-size:12px;color:#6b21a8"><div style="margin-bottom:5px"><strong>' + formatRecurrence(t.recurrence) + '</strong></div><div style="font-size:11px;opacity:0.8"><div>Создано: ' + (t.recurrence.currentCount || 0) + ' экз.</div>' + (t.recurrence.nextRunAt ? '<div>Следующий: ' + formatDateTime(t.recurrence.nextRunAt) + '</div>' : '') + '</div></div></div>' : '') + '</div>';
+    const bodyHtml = bannerHtml + '<div><div class="conversation"><div class="conversation-title">💬 Переписка (' + t.comments.length + ')</div><div class="message message-client"><div class="message-header"><span class="message-author">📩 От ' + (client ? client.name : 'заявителя') + '</span><span class="message-time">' + formatDateTime(t.createdAt) + '</span></div><div class="message-body">' + t.description + '</div></div>' + messagesHtml + (!isResolved ? '<div class="reply-box"><textarea id="replyText" placeholder="Ответ заявителю..."></textarea><div class="reply-actions"><button class="btn btn-primary" onclick="window.sendReplyFromModal(\'' + t.id + '\')">Отправить</button></div></div>' : '') + '</div></div><div><div class="info-card" style="margin-bottom:12px"><div class="info-card-title">Заявитель</div>' + (client ? '<div class="client-card"><div class="client-avatar">' + getInitials(client.name) + '</div><div class="client-info"><div class="client-name">' + client.name + '</div><div class="client-email">' + client.email + '</div>' + (client.phone ? '<div class="client-email">' + client.phone + '</div>' : '') + (client.contractNumber ? '<div class="client-email">📄 Договор: ' + client.contractNumber + '</div>' : '') + '</div></div>' + (company ? '<div style="font-size:11px;color:var(--text-light);margin-top:5px">🏢 ' + company.name + '</div>' : '') : '<div style="color:var(--text-muted);font-size:12px">Не указан</div>') + '</div><div class="info-card"><div class="info-card-title">Свойства</div><div class="info-row"><span class="info-row-label">Статус</span><select onchange="window.updateTicketField(\'' + t.id + '\',\'status\',this.value);window.refreshTicketModal()">' + Object.entries(STATUS_LABELS).map(([k,v]) => '<option value="' + k + '" ' + (t.status===k?'selected':'') + '>' + v + '</option>').join('') + '</select></div><div class="info-row"><span class="info-row-label">Приоритет</span><select onchange="window.updateTicketField(\'' + t.id + '\',\'priority\',this.value);window.refreshTicketModal()">' + Object.entries(PRIORITY_LABELS).map(([k,v]) => '<option value="' + k + '" ' + (t.priority===k?'selected':'') + '>' + v + '</option>').join('') + '</select></div><div class="info-row"><span class="info-row-label">Исполнитель</span><select onchange="window.updateTicketField(\'' + t.id + '\',\'assigneeId\',this.value);window.refreshTicketModal()"><option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (t.assigneeId===u.id?'selected':'') + '>' + u.fullName + '</option>').join('') + '</select></div><div class="info-row"><span class="info-row-label">Категория</span><select onchange="window.updateTicketField(\'' + t.id + '\',\'category\',this.value);window.refreshTicketModal()">' + state.categories.map(c => '<option value="' + c.id + '" ' + (t.category===c.id?'selected':'') + '>' + c.name + '</option>').join('') + '</select></div></div>' + (isRecurringTemplate ? '<div class="info-card" style="margin-top:12px;background:linear-gradient(135deg, #f5f3ff, #ede9fe);border-color:#c4b5fd"><div class="info-card-title" style="color:#6b21a8">🔁 Повторение</div><div style="font-size:12px;color:#6b21a8"><div style="margin-bottom:5px"><strong>' + formatRecurrence(t.recurrence) + '</strong></div><div style="font-size:11px;opacity:0.8"><div>Создано: ' + (t.recurrence.currentCount || 0) + ' экз.</div>' + (t.recurrence.nextRunAt ? '<div>Следующий: ' + formatDateTime(t.recurrence.nextRunAt) + '</div>' : '') + '</div></div></div>' : '') + '</div>';
     document.getElementById('ticketModalBody').innerHTML = bodyHtml;
     openModal('ticketViewModal');
 }
@@ -1134,7 +1471,7 @@ function saveTicket(e) {
         }; 
         state.tickets.push(newT); 
         selectedTicketId = newT.id; 
-        toast(data.recurrence ? ' Повторяющаяся заявка создана' : 'Заявка создана'); 
+        toast(data.recurrence ? '🔁 Повторяющаяся заявка создана' : 'Заявка создана'); 
     } 
     save(); 
     closeModal('ticketModal'); 
@@ -1142,11 +1479,11 @@ function saveTicket(e) {
     updateAllCounters();
 }
 
-function renderRecurring() { const list = document.getElementById('recurringList'); const templates = state.tickets.filter(t => t.recurrence); if (templates.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><p>Нет повторяющихся заявок</p></div>'; return; } list.innerHTML = templates.map(t => { const rec = t.recurrence; const client = getClient(t.clientId); const agent = getUser(t.assigneeId); const dep = agent ? getDepartment(agent.departmentId) : null; const instances = state.tickets.filter(x => x.recurringParentId === t.id).length; return '<div class="card" style="margin-bottom:12px;padding:15px;border-left:3px solid #8b5cf6"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-size:18px">🔁</span><strong style="font-size:14px;color:var(--primary-dark)">' + t.subject + '</strong><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (rec.enabled ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">АКТИВНО</span>' : '<span style="background:#e5e7eb;color:#374151;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">ПРИОСТАНОВЛЕНО</span>') + '</div><div style="font-size:11px;color:var(--text-light);display:flex;gap:12px;flex-wrap:wrap"><span>📋 ' + t.number + '</span><span>👤 ' + (client ? client.name : '—') + '</span><span>🧑‍💼 ' + (agent ? agent.fullName : 'Не назначен') + '</span>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '<span>🔁 <strong>' + formatRecurrence(rec) + '</strong></span><span>📄 Экземпляров: <strong>' + (rec.currentCount || 0) + '</strong></span></div><div style="font-size:11px;color:var(--text-light);margin-top:5px">' + (rec.lastRunAt ? 'Последнее: ' + formatDateTime(rec.lastRunAt) + ' • ' : '') + (rec.nextRunAt ? 'Следующее: <strong>' + formatDateTime(rec.nextRunAt) + '</strong>' : '') + '</div></div><div style="display:flex;gap:5px;align-items:center"><button class="btn btn-small" onclick="window.selectTicket(\'' + t.id + '\')">👁 Открыть</button><button class="btn btn-small" onclick="window.toggleRecurrence(\'' + t.id + '\')">' + (rec.enabled ? '⏸ Пауза' : '▶ Старт') + '</button></div></div></div>'; }).join(''); }
+function renderRecurring() { const list = document.getElementById('recurringList'); const templates = state.tickets.filter(t => t.recurrence); if (templates.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔁</div><p>Нет повторяющихся заявок</p></div>'; return; } list.innerHTML = templates.map(t => { const rec = t.recurrence; const client = getClient(t.clientId); const agent = getUser(t.assigneeId); const dep = agent ? getDepartment(agent.departmentId) : null; const instances = state.tickets.filter(x => x.recurringParentId === t.id).length; return '<div class="card" style="margin-bottom:12px;padding:15px;border-left:3px solid #8b5cf6"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-size:18px">🔁</span><strong style="font-size:14px;color:var(--primary-dark)">' + t.subject + '</strong><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (rec.enabled ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">АКТИВНО</span>' : '<span style="background:#e5e7eb;color:#374151;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">ПРИОСТАНОВЛЕНО</span>') + '</div><div style="font-size:11px;color:var(--text-light);display:flex;gap:12px;flex-wrap:wrap"><span>📋 ' + t.number + '</span><span>👤 ' + (client ? client.name : '—') + '</span><span>🧑‍💼 ' + (agent ? agent.fullName : 'Не назначен') + '</span>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '<span>🔁 <strong>' + formatRecurrence(rec) + '</strong></span><span>📄 Экземпляров: <strong>' + (rec.currentCount || 0) + '</strong></span></div><div style="font-size:11px;color:var(--text-light);margin-top:5px">' + (rec.lastRunAt ? 'Последнее: ' + formatDateTime(rec.lastRunAt) + ' • ' : '') + (rec.nextRunAt ? 'Следующее: <strong>' + formatDateTime(rec.nextRunAt) + '</strong>' : '') + '</div></div><div style="display:flex;gap:5px;align-items:center"><button class="btn btn-small" onclick="window.selectTicket(\'' + t.id + '\')">👁 Открыть</button><button class="btn btn-small" onclick="window.toggleRecurrence(\'' + t.id + '\')">' + (rec.enabled ? '⏸ Пауза' : '▶ Старт') + '</button></div></div></div>'; }).join(''); }
 
-function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; const company = c.companyId ? getCompany(c.companyId) : null; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + '</td><td>' + c.email + '</td><td>' + (c.phone || '—') + '</td><td>' + (company ? company.name : '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
-function openClientModal(id) { document.getElementById('clientForm').reset(); document.getElementById('clientId').value = ''; document.getElementById('clientModalTitle').textContent = 'Новый заявитель'; document.getElementById('clientCompany').innerHTML = '<option value="">Без компании</option>' + state.companies.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (id) { const c = getClient(id); document.getElementById('clientId').value = c.id; document.getElementById('clientName').value = c.name; document.getElementById('clientEmail').value = c.email; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientCompany').value = c.companyId || ''; document.getElementById('clientModalTitle').textContent = 'Редактировать'; } openModal('clientModal'); }
-function saveClient(e) { e.preventDefault(); const id = document.getElementById('clientId').value; const data = { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, companyId: document.getElementById('clientCompany').value }; if (id) Object.assign(getClient(id), data); else state.clients.push({ id: 'c' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('clientModal'); renderClients(); updateAllCounters(); }
+function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; const company = c.companyId ? getCompany(c.companyId) : null; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + '</td><td>' + c.email + '</td><td>' + (c.phone || '—') + '</td><td>' + (c.contractNumber || '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
+function openClientModal(id) { document.getElementById('clientForm').reset(); document.getElementById('clientId').value = ''; document.getElementById('clientModalTitle').textContent = 'Новый заявитель'; document.getElementById('clientCompany').innerHTML = '<option value="">Без компании</option>' + state.companies.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (id) { const c = getClient(id); document.getElementById('clientId').value = c.id; document.getElementById('clientName').value = c.name; document.getElementById('clientEmail').value = c.email; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientContract').value = c.contractNumber || ''; document.getElementById('clientCompany').value = c.companyId || ''; document.getElementById('clientModalTitle').textContent = 'Редактировать'; } openModal('clientModal'); }
+function saveClient(e) { e.preventDefault(); const id = document.getElementById('clientId').value; const data = { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, contractNumber: document.getElementById('clientContract').value, companyId: document.getElementById('clientCompany').value }; if (id) Object.assign(getClient(id), data); else state.clients.push({ id: 'c' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('clientModal'); renderClients(); updateAllCounters(); }
 function deleteClient(id) { if (!confirm('Удалить?')) return; state.clients = state.clients.filter(c => c.id !== id); save(); renderClients(); updateAllCounters(); }
 
 function renderCompanies() { const tbody = document.getElementById('companiesTable'); if (state.companies.length === 0) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>Нет компаний</p></div></td></tr>'; return; } tbody.innerHTML = state.companies.map(c => { const clientCount = state.clients.filter(cl => cl.companyId === c.id).length; const ticketCount = state.tickets.filter(t => { const cl = getClient(t.clientId); return cl && cl.companyId === c.id; }).length; return '<tr><td><strong>' + c.name + '</strong></td><td>' + (c.domain || '—') + '</td><td>' + clientCount + '</td><td>' + ticketCount + '</td><td class="actions-cell"><button class="btn btn-small" onclick="window.openCompanyModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteCompany(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
@@ -1156,7 +1493,7 @@ function deleteCompany(id) { if (!confirm('Удалить?')) return; state.comp
 
 function renderStaff() { const tbody = document.getElementById('staffTable'); tbody.innerHTML = state.users.map(u => { const dep = getDepartment(u.departmentId); const open = state.tickets.filter(t => t.assigneeId === u.id && !['solved','closed'].includes(t.status)).length; const solved = state.tickets.filter(t => t.assigneeId === u.id && (t.status === 'solved' || t.status === 'closed')).length; return '<tr><td><span class="avatar-small">' + getInitials(u.fullName) + '</span>' + u.fullName + (u.id === CURRENT_USER_ID ? ' <span style="font-size:10px;color:var(--primary);font-weight:600">← вы</span>' : '') + '</td><td>' + u.phone + '</td><td>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '—') + '</td><td><span class="role-badge role-' + u.role + '">' + ROLE_LABELS[u.role] + '</span></td><td><strong>' + open + '</strong></td><td><strong>' + solved + '</strong></td></tr>'; }).join(''); }
 
-function renderDepartments() { if (!isAdmin()) return; const list = document.getElementById('departmentsList'); if (state.departments.length === 0) { list.innerHTML = '<div class="empty-state"><p>Нет отделов</p></div>'; return; } list.innerHTML = state.departments.map(d => { const members = state.users.filter(u => u.departmentId === d.id); const ticketsCount = state.tickets.filter(t => { const u = getUser(t.assigneeId); return u && u.departmentId === d.id; }).length; return '<div class="card" style="margin-bottom:12px;padding:15px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;background:' + d.color + ';display:flex;align-items:center;justify-content:center;color:white;font-size:18px">🏛</div><div><div style="font-weight:600;font-size:15px">' + d.name + '</div><div style="font-size:12px;color:var(--text-light)">' + (d.description || 'Без описания') + ' •  ' + ticketsCount + ' заявок</div></div></div><div style="display:flex;gap:5px"><button class="btn btn-small" onclick="window.openDepartmentModal(\'' + d.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteDepartment(\'' + d.id + '\')">🗑️</button></div></div><div style="font-size:12px;color:var(--text-light);margin-bottom:8px">👥 Сотрудники (' + members.length + '):</div><div style="display:flex;flex-wrap:wrap;gap:6px">' + (members.length ? members.map(u => '<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg);border-radius:15px;font-size:12px"><span class="avatar-small" style="width:20px;height:20px;font-size:9px;margin:0">' + getInitials(u.fullName) + '</span>' + u.fullName + (u.role === 'admin' ? ' <span style="font-size:9px;background:#fef3c7;color:#92400e;padding:1px 5px;border-radius:8px">ADMIN</span>' : '') + '</span>').join('') : '<span style="font-size:12px;color:var(--text-muted);font-style:italic">Нет сотрудников</span>') + '</div></div>'; }).join(''); }
+function renderDepartments() { if (!isAdmin()) return; const list = document.getElementById('departmentsList'); if (state.departments.length === 0) { list.innerHTML = '<div class="empty-state"><p>Нет отделов</p></div>'; return; } list.innerHTML = state.departments.map(d => { const members = state.users.filter(u => u.departmentId === d.id); const ticketsCount = state.tickets.filter(t => { const u = getUser(t.assigneeId); return u && u.departmentId === d.id; }).length; return '<div class="card" style="margin-bottom:12px;padding:15px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;background:' + d.color + ';display:flex;align-items:center;justify-content:center;color:white;font-size:18px">🏛</div><div><div style="font-weight:600;font-size:15px">' + d.name + '</div><div style="font-size:12px;color:var(--text-light)">' + (d.description || 'Без описания') + ' • 📥 ' + ticketsCount + ' заявок</div></div></div><div style="display:flex;gap:5px"><button class="btn btn-small" onclick="window.openDepartmentModal(\'' + d.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteDepartment(\'' + d.id + '\')">🗑️</button></div></div><div style="font-size:12px;color:var(--text-light);margin-bottom:8px">👥 Сотрудники (' + members.length + '):</div><div style="display:flex;flex-wrap:wrap;gap:6px">' + (members.length ? members.map(u => '<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg);border-radius:15px;font-size:12px"><span class="avatar-small" style="width:20px;height:20px;font-size:9px;margin:0">' + getInitials(u.fullName) + '</span>' + u.fullName + (u.role === 'admin' ? ' <span style="font-size:9px;background:#fef3c7;color:#92400e;padding:1px 5px;border-radius:8px">ADMIN</span>' : '') + '</span>').join('') : '<span style="font-size:12px;color:var(--text-muted);font-style:italic">Нет сотрудников</span>') + '</div></div>'; }).join(''); }
 function openDepartmentModal(id) { if (!isAdmin()) return; document.getElementById('departmentForm').reset(); document.getElementById('departmentId').value = ''; document.getElementById('departmentModalTitle').textContent = 'Новый отдел'; if (id) { const d = getDepartment(id); document.getElementById('departmentId').value = d.id; document.getElementById('departmentName').value = d.name; document.getElementById('departmentDescription').value = d.description || ''; document.getElementById('departmentColor').value = d.color || '#10b981'; document.getElementById('departmentModalTitle').textContent = 'Редактировать отдел'; } openModal('departmentModal'); }
 function saveDepartment(e) { e.preventDefault(); const id = document.getElementById('departmentId').value; const data = { name: document.getElementById('departmentName').value, description: document.getElementById('departmentDescription').value, color: document.getElementById('departmentColor').value }; if (id) Object.assign(getDepartment(id), data); else state.departments.push({ id: 'dep' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('departmentModal'); renderDepartments(); updateAllCounters(); }
 function deleteDepartment(id) { if (!isAdmin()) return; if (!confirm('Удалить отдел?')) return; state.departments = state.departments.filter(d => d.id !== id); state.users.forEach(u => { if (u.departmentId === id) u.departmentId = ''; }); save(); renderDepartments(); updateAllCounters(); }
@@ -1166,22 +1503,21 @@ function openUserModal(id) { if (!isAdmin()) return; const u = getUser(id); if (
 function saveUser(e) { e.preventDefault(); const id = document.getElementById('userId').value; const u = getUser(id); if (!u) return; const newPin = document.getElementById('userPin').value; u.fullName = document.getElementById('userFullName').value; u.phone = document.getElementById('userPhone').value; u.departmentId = document.getElementById('userDepartment').value; u.role = document.getElementById('userRole').value; if (newPin && /^\d{4}$/.test(newPin)) u.pin = newPin; else if (newPin && !/^\d{4}$/.test(newPin)) { toast('Пин должен быть 4 цифры', 'error'); return; } save(); closeModal('userModal'); renderUsers(); toast('Пользователь обновлён'); updateAllCounters(); }
 function deleteUser(id) { if (!isAdmin()) return; if (id === CURRENT_USER_ID) { toast('Нельзя удалить себя', 'error'); return; } if (!confirm('Удалить пользователя?')) return; state.users = state.users.filter(u => u.id !== id); state.tickets.forEach(t => { if (t.assigneeId === id) t.assigneeId = ''; }); save(); renderUsers(); updateAllCounters(); }
 
-function renderDashboard() { const visible = getVisibleTickets(); const total = visible.length; const open = visible.filter(t => ['new','open','pending'].includes(t.status)).length; const solved = visible.filter(t => t.status === 'solved' || t.status === 'closed').length; const myOpen = visible.filter(t => t.assigneeId === CURRENT_USER_ID && !['solved','closed'].includes(t.status)).length; const mySolved = visible.filter(t => t.assigneeId === CURRENT_USER_ID && (t.status === 'solved' || t.status === 'closed')).length; const recurringCount = visible.filter(t => t.recurrence && t.recurrence.enabled).length; const title = isAdmin() ? '📊 Общая статистика' : '📊 Моя статистика'; document.getElementById('dashboardContent').innerHTML = '<h2 style="margin-bottom:15px;color:var(--primary-dark)">' + title + '</h2><div class="stats-grid"><div class="stat-card"><div class="stat-label">Всего заявок</div><div class="stat-value">' + total + '</div></div><div class="stat-card"><div class="stat-label">Открытых</div><div class="stat-value" style="color:var(--warning)">' + open + '</div></div><div class="stat-card"><div class="stat-label">Решённых</div><div class="stat-value" style="color:var(--success)">' + solved + '</div></div><div class="stat-card"><div class="stat-label">Мои открытые</div><div class="stat-value">' + myOpen + '</div></div><div class="stat-card"><div class="stat-label">Мои решённые</div><div class="stat-value" style="color:var(--success)">' + mySolved + '</div></div><div class="stat-card"><div class="stat-label">🔁 Повторяющихся</div><div class="stat-value" style="color:#8b5cf6">' + recurringCount + '</div></div></div><div class="report-card"><h3>📊 По статусам</h3><div class="bar-chart" id="dashChart1"></div></div>' + (isAdmin() ? '<div class="report-card"><h3> Загрузка по сотрудникам</h3><div class="bar-chart" id="dashChart2"></div></div><div class="report-card"><h3> Загрузка по отделам</h3><div class="bar-chart" id="dashChart3"></div></div>' : ''); renderBarChart('dashChart1', Object.entries(STATUS_LABELS).map(([k,v]) => ({ label: v, value: visible.filter(t => t.status === k).length }))); if (isAdmin()) { renderBarChart('dashChart2', state.users.map(u => ({ label: u.fullName.split(' ')[0], value: visible.filter(t => t.assigneeId === u.id && !['solved','closed'].includes(t.status)).length }))); renderBarChart('dashChart3', state.departments.map(d => ({ label: d.name, value: visible.filter(t => { const u = getUser(t.assigneeId); return u && u.departmentId === d.id && !['solved','closed'].includes(t.status); }).length }))); } }
+function renderDashboard() { const visible = getVisibleTickets(); const total = visible.length; const open = visible.filter(t => ['new','open','pending'].includes(t.status)).length; const solved = visible.filter(t => t.status === 'solved' || t.status === 'closed').length; const myOpen = visible.filter(t => t.assigneeId === CURRENT_USER_ID && !['solved','closed'].includes(t.status)).length; const mySolved = visible.filter(t => t.assigneeId === CURRENT_USER_ID && (t.status === 'solved' || t.status === 'closed')).length; const recurringCount = visible.filter(t => t.recurrence && t.recurrence.enabled).length; const title = isAdmin() ? '📊 Общая статистика' : '📊 Моя статистика'; document.getElementById('dashboardContent').innerHTML = '<h2 style="margin-bottom:15px;color:var(--primary-dark)">' + title + '</h2><div class="stats-grid"><div class="stat-card"><div class="stat-label">Всего заявок</div><div class="stat-value">' + total + '</div></div><div class="stat-card"><div class="stat-label">Открытых</div><div class="stat-value" style="color:var(--warning)">' + open + '</div></div><div class="stat-card"><div class="stat-label">Решённых</div><div class="stat-value" style="color:var(--success)">' + solved + '</div></div><div class="stat-card"><div class="stat-label">Мои открытые</div><div class="stat-value">' + myOpen + '</div></div><div class="stat-card"><div class="stat-label">Мои решённые</div><div class="stat-value" style="color:var(--success)">' + mySolved + '</div></div><div class="stat-card"><div class="stat-label">🔁 Повторяющихся</div><div class="stat-value" style="color:#8b5cf6">' + recurringCount + '</div></div></div><div class="report-card"><h3>📊 По статусам</h3><div class="bar-chart" id="dashChart1"></div></div>' + (isAdmin() ? '<div class="report-card"><h3>👥 Загрузка по сотрудникам</h3><div class="bar-chart" id="dashChart2"></div></div><div class="report-card"><h3>🏛 Загрузка по отделам</h3><div class="bar-chart" id="dashChart3"></div></div>' : ''); renderBarChart('dashChart1', Object.entries(STATUS_LABELS).map(([k,v]) => ({ label: v, value: visible.filter(t => t.status === k).length }))); if (isAdmin()) { renderBarChart('dashChart2', state.users.map(u => ({ label: u.fullName.split(' ')[0], value: visible.filter(t => t.assigneeId === u.id && !['solved','closed'].includes(t.status)).length }))); renderBarChart('dashChart3', state.departments.map(d => ({ label: d.name, value: visible.filter(t => { const u = getUser(t.assigneeId); return u && u.departmentId === d.id && !['solved','closed'].includes(t.status); }).length }))); } }
 function renderBarChart(id, data) { const max = Math.max(...data.map(d => d.value), 1); document.getElementById(id).innerHTML = data.map(d => '<div class="bar-row"><div class="bar-label">' + d.label + '</div><div class="bar-track"><div class="bar-fill" style="width:' + ((d.value/max)*100) + '%">' + (d.value > 0 ? d.value : '') + '</div></div><div class="bar-value">' + d.value + '</div></div>').join(''); }
 
 function renderReports() { const visible = getVisibleTickets(); const total = visible.length; const solved = visible.filter(t => t.status === 'solved' || t.status === 'closed').length; const rate = total ? Math.round((solved/total)*100) : 0; const recurringCount = visible.filter(t => t.recurrence && t.recurrence.enabled).length; document.getElementById('reportsContent').innerHTML = '<div class="stats-grid"><div class="stat-card"><div class="stat-label">Всего</div><div class="stat-value">' + total + '</div></div><div class="stat-card"><div class="stat-label">% решённых</div><div class="stat-value" style="color:var(--success)">' + rate + '%</div></div><div class="stat-card"><div class="stat-label">🔁 Повторяющихся</div><div class="stat-value" style="color:#8b5cf6">' + recurringCount + '</div></div><div class="stat-card"><div class="stat-label">Отделов</div><div class="stat-value">' + state.departments.length + '</div></div></div><div class="report-card"><h3>📂 По категориям</h3><div class="bar-chart" id="rep1"></div></div><div class="report-card"><h3>🎯 По приоритетам</h3><div class="bar-chart" id="rep2"></div></div>' + (isAdmin() ? '<div class="report-card"><h3>👥 Производительность по сотрудникам</h3><table style="width:100%"><thead><tr><th>Сотрудник</th><th>Отдел</th><th>Открытых</th><th>Решено</th></tr></thead><tbody>' + state.users.map(u => { const dep = getDepartment(u.departmentId); const open = visible.filter(t => t.assigneeId === u.id && !['solved','closed'].includes(t.status)).length; const solved = visible.filter(t => t.assigneeId === u.id && (t.status === 'solved' || t.status === 'closed')).length; return '<tr><td>' + u.fullName + '</td><td>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '—') + '</td><td>' + open + '</td><td>' + solved + '</td></tr>'; }).join('') + '</tbody></table></div><div class="report-card"><h3>🏛 Производительность по отделам</h3><table style="width:100%"><thead><tr><th>Отдел</th><th>Сотрудников</th><th>Открытых</th><th>Решено</th></tr></thead><tbody>' + state.departments.map(d => { const members = state.users.filter(u => u.departmentId === d.id); const open = visible.filter(t => { const u = getUser(t.assigneeId); return u && u.departmentId === d.id && !['solved','closed'].includes(t.status); }).length; const solved = visible.filter(t => { const u = getUser(t.assigneeId); return u && u.departmentId === d.id && (t.status === 'solved' || t.status === 'closed'); }).length; return '<tr><td><span class="dept-badge" style="background:' + d.color + '22;color:' + d.color + '">' + d.name + '</span></td><td>' + members.length + '</td><td>' + open + '</td><td>' + solved + '</td></tr>'; }).join('') + '</tbody></table></div>' : '<div class="report-card"><h3>📈 Моя производительность</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:10px"><div style="padding:15px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:11px;color:var(--text-light);text-transform:uppercase;margin-bottom:5px">Открытых</div><div style="font-size:28px;font-weight:700;color:var(--warning)">' + visible.filter(t => t.assigneeId === CURRENT_USER_ID && !['solved','closed'].includes(t.status)).length + '</div></div><div style="padding:15px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:11px;color:var(--text-light);text-transform:uppercase;margin-bottom:5px">Решено</div><div style="font-size:28px;font-weight:700;color:var(--success)">' + visible.filter(t => t.assigneeId === CURRENT_USER_ID && (t.status === 'solved' || t.status === 'closed')).length + '</div></div></div></div>') + '</div>'; renderBarChart('rep1', state.categories.map(c => ({ label: c.name, value: visible.filter(t => t.category === c.id).length }))); renderBarChart('rep2', Object.entries(PRIORITY_LABELS).map(([k,v]) => ({ label: v, value: visible.filter(t => t.priority === k).length }))); }
 
 let currentSettingsTab = 'profile';
 document.querySelectorAll('.settings-nav-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.settings-nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active'); currentSettingsTab = item.dataset.settings; renderSettings(); }); });
-
 function renderSettings() { 
     const c = document.getElementById('settingsContent'); 
     if (currentSettingsTab === 'profile') { 
         const u = getCurrentUser(); 
         const dep = getDepartment(u.departmentId); 
-        c.innerHTML = '<div class="settings-section"><h3>👤 Мой профиль</h3><div style="display:flex;gap:15px;align-items:center;margin-bottom:20px;padding:15px;background:var(--bg);border-radius:8px"><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#10b981,#34d399);color:white;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600">' + getInitials(u.fullName) + '</div><div><div style="font-size:16px;font-weight:600">' + u.fullName + '</div><div style="font-size:12px;color:var(--text-light)">' + u.phone + '</div><div style="font-size:12px;color:var(--text-light);margin-top:3px">' + (dep ? dep.name : 'Без отдела') + ' • <span class="role-badge role-' + u.role + '">' + ROLE_LABELS[u.role] + '</span></div></div></div><div class="form-group"><label>ФИО</label><input type="text" id="profileFullName" value="' + u.fullName + '"></div><div class="form-group"><label>Телефон</label><input type="tel" id="profilePhone" value="' + u.phone + '"></div><div class="form-group"><label>Новый пин-код (4 цифры)</label><input type="password" id="profilePin" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div><button class="btn btn-primary" onclick="window.saveProfile()"> Сохранить</button></div>'; 
+        c.innerHTML = '<div class="settings-section"><h3>👤 Мой профиль</h3><div style="display:flex;gap:15px;align-items:center;margin-bottom:20px;padding:15px;background:var(--bg);border-radius:8px"><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#10b981,#34d399);color:white;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600">' + getInitials(u.fullName) + '</div><div><div style="font-size:16px;font-weight:600">' + u.fullName + '</div><div style="font-size:12px;color:var(--text-light)">' + u.phone + '</div><div style="font-size:12px;color:var(--text-light);margin-top:3px">' + (dep ? dep.name : 'Без отдела') + ' • <span class="role-badge role-' + u.role + '">' + ROLE_LABELS[u.role] + '</span></div></div></div><div class="form-group"><label>ФИО</label><input type="text" id="profileFullName" value="' + u.fullName + '"></div><div class="form-group"><label>Телефон</label><input type="tel" id="profilePhone" value="' + u.phone + '"></div><div class="form-group"><label>Новый пин-код (4 цифры)</label><input type="password" id="profilePin" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div><button class="btn btn-primary" onclick="window.saveProfile()">💾 Сохранить</button></div>'; 
     } else if (currentSettingsTab === 'system' && isAdmin()) { 
-        c.innerHTML = '<div class="settings-section"><h3>⚙️ Настройки системы</h3><div class="form-group"><label>Название компании</label><input type="text" id="setCompanyName" value="' + (state.settings.companyName || '') + '"></div><div class="form-group"><label>Тема оформления</label><select id="setTheme"><option value="light" ' + (state.settings.theme==='light'?'selected':'') + '> Светлая</option><option value="dark" ' + (state.settings.theme==='dark'?'selected':'') + '>🌑 Тёмная</option></select></div><div class="form-group"><label>Автоархивация решённых заявок (часы)</label><input type="number" id="setAutoArchive" value="' + (state.settings.autoArchiveHours || 24) + '" min="1" max="720"><div class="form-hint">Заявки автоматически переносятся в архив через указанное время после решения</div></div><div class="form-group"><label>👤 Ответственный за заявки заявителей</label><select id="setDefaultAssignee"><option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (state.settings.defaultAssigneeId === u.id ? 'selected' : '') + '>' + u.fullName + '</option>').join('') + '</select><div class="form-hint">Заявки от заявителей будут автоматически назначаться на этого сотрудника</div></div><div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="setSoundEnabled" ' + (state.settings.soundEnabled !== false ? 'checked' : '') + ' style="width:auto">🔔 Звуковые уведомления</label><div class="form-hint">Включить звуковые сигналы при новых событиях</div></div><button class="btn btn-primary" onclick="window.saveSystemSettings()">💾 Сохранить настройки</button></div><div class="settings-section"><h3> Экспорт / Импорт данных</h3><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"><button class="btn btn-primary" onclick="window.exportData()">📤 Экспорт в JSON</button><button class="btn" onclick="document.getElementById(\'importFile\').click()"> Импорт из JSON</button><input type="file" id="importFile" style="display:none" accept=".json" onchange="window.importData(event)"></div><div style="padding:12px;background:#fee2e2;border-radius:6px;color:#991b1b"><strong>⚠️ Опасная зона</strong><div style="margin-top:8px"><button class="btn btn-danger btn-small" onclick="window.resetDemoData()">🔄 Сбросить все данные</button></div></div></div>'; 
+        c.innerHTML = '<div class="settings-section"><h3>⚙️ Настройки системы</h3><div class="form-group"><label>Название компании</label><input type="text" id="setCompanyName" value="' + (state.settings.companyName || '') + '"></div><div class="form-group"><label>Тема оформления</label><select id="setTheme"><option value="light" ' + (state.settings.theme==='light'?'selected':'') + '>🌿 Светлая</option><option value="dark" ' + (state.settings.theme==='dark'?'selected':'') + '>🌑 Тёмная</option></select></div><div class="form-group"><label>Автоархивация решённых заявок (часы)</label><input type="number" id="setAutoArchive" value="' + (state.settings.autoArchiveHours || 24) + '" min="1" max="720"><div class="form-hint">Заявки автоматически переносятся в архив через указанное время после решения</div></div><div class="form-group"><label>👤 Ответственный за заявки заявителей</label><select id="setDefaultAssignee"><option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (state.settings.defaultAssigneeId === u.id ? 'selected' : '') + '>' + u.fullName + '</option>').join('') + '</select><div class="form-hint">Заявки от заявителей будут автоматически назначаться на этого сотрудника</div></div><div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="setSoundEnabled" ' + (state.settings.soundEnabled !== false ? 'checked' : '') + ' style="width:auto">🔔 Звуковые уведомления</label><div class="form-hint">Включить звуковые сигналы при новых событиях</div></div><button class="btn btn-primary" onclick="window.saveSystemSettings()">💾 Сохранить настройки</button></div><div class="settings-section"><h3>💾 Экспорт / Импорт данных</h3><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"><button class="btn btn-primary" onclick="window.exportData()">📤 Экспорт в JSON</button><button class="btn" onclick="document.getElementById(\'importFile\').click()">📥 Импорт из JSON</button><input type="file" id="importFile" style="display:none" accept=".json" onchange="window.importData(event)"></div><div style="padding:12px;background:#fee2e2;border-radius:6px;color:#991b1b"><strong>⚠️ Опасная зона</strong><div style="margin-top:8px"><button class="btn btn-danger btn-small" onclick="window.resetDemoData()">🔄 Сбросить все данные</button></div></div></div>'; 
     } else if (currentSettingsTab === 'categories' && isAdmin()) { 
         c.innerHTML = '<div class="settings-section"><h3>📂 Категории</h3><div>' + state.categories.map(cat => '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:8px;background:var(--bg);border-radius:6px"><input type="color" value="' + cat.color + '" onchange="window.updateCategory(\'' + cat.id + '\',\'color\',this.value)" style="width:40px;height:30px;border:none;cursor:pointer"><input type="text" value="' + cat.name + '" onchange="window.updateCategory(\'' + cat.id + '\',\'name\',this.value)" style="flex:1;padding:5px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text)"><button class="btn btn-small btn-danger" onclick="window.deleteCategory(\'' + cat.id + '\')">×</button></div>').join('') + '</div></div>'; 
     } else if (currentSettingsTab === 'data' && isAdmin()) { 
@@ -1190,7 +1526,6 @@ function renderSettings() {
         c.innerHTML = '<div class="empty-state"><p>Нет доступа</p></div>'; 
     } 
 }
-
 function saveProfile() { 
     const u = getCurrentUser(); 
     u.fullName = document.getElementById('profileFullName').value; 
@@ -1205,7 +1540,6 @@ function saveProfile() {
     toast('Профиль обновлён'); 
     renderSettings(); 
 }
-
 function saveSystemSettings() {
     state.settings.companyName = document.getElementById('setCompanyName').value;
     state.settings.theme = document.getElementById('setTheme').value;
@@ -1218,7 +1552,6 @@ function saveSystemSettings() {
     renderSettings();
     updateAllCounters();
 }
-
 function updateCategory(id, field, value) { const c = getCategory(id); if (c) { c[field] = value; save(); } }
 function deleteCategory(id) { if (!confirm('Удалить?')) return; state.categories = state.categories.filter(c => c.id !== id); save(); renderSettings(); }
 function resetDemoData() { if (!confirm('Сбросить все данные?')) return; Object.keys(localStorage).filter(k => k.startsWith('hd_')).forEach(k => localStorage.removeItem(k)); location.reload(); }
@@ -1251,7 +1584,7 @@ function importData(event) {
       if (data.categories) state.categories = data.categories;
       if (data.settings) state.settings = data.settings;
       save();
-      toast(' Данные импортированы');
+      toast('📥 Данные импортированы');
       location.reload();
     } catch (err) {
       toast('❌ Ошибка импорта: ' + err.message, 'error');
@@ -1351,7 +1684,7 @@ async function initApp() {
   
   console.log('👥 Итого пользователей:', state.users.length);
   const admin = state.users.find(u => u.role === 'admin');
-  console.log(' Администратор:', admin ? admin.fullName + ' (пин: ' + admin.pin + ')' : 'НЕ НАЙДЕН');
+  console.log('👤 Администратор:', admin ? admin.fullName + ' (пин: ' + admin.pin + ')' : 'НЕ НАЙДЕН');
 
   onSnapshot(doc(db, 'crm_data', 'main'), (doc) => {
     if (doc.exists() && !isSaving) {
@@ -1383,15 +1716,23 @@ async function initApp() {
 
   if (state.settings.theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   
-  // Показываем портал для заявителей по умолчанию
-  document.getElementById('clientPortal').style.display = 'block';
-  
   // Заполняем категории в форме заявителя
   const categorySelect = document.getElementById('publicTicketCategory');
   if (categorySelect) {
     categorySelect.innerHTML = '<option value="">Не выбрана</option>' + state.categories.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
   }
   
+  // Проверяем сессию заявителя
+  if (state.clientSession && state.clientSession.clientId) {
+    const client = getClient(state.clientSession.clientId);
+    if (client) {
+      CURRENT_CLIENT_ID = client.id;
+      showClientDashboard();
+      return;
+    }
+  }
+  
+  checkAuth();
   startAutoArchive();
 }
 
