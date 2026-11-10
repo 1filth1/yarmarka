@@ -75,6 +75,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .btn-info { background: var(--info); color: white; border-color: var(--info); }
 .btn-ghost { background: transparent; border-color: transparent; color: var(--text-light); }
 .btn-small { padding: 4px 9px; font-size: 12px; }
+.btn-close-action { background: #6b7280; color: white; border: none; padding: 8px 16px; font-weight: 600; border-radius: 6px; cursor: pointer; }
+.btn-close-action:hover { background: #4b5563; }
 .tickets-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
 .tickets-list-panel { width: 100%; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .tickets-filters { padding: 10px 15px; border-bottom: 1px solid var(--border); background: var(--card); }
@@ -159,9 +161,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .modal-content.large { max-width: 900px; }
 .ticket-modal-content { max-width: 1000px; width: 95%; max-height: 90vh; }
 .ticket-modal-body { display: grid; grid-template-columns: 1fr 300px; gap: 20px; padding: 20px; overflow-y: auto; max-height: calc(90vh - 120px); }
-.ticket-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
-.ticket-modal-title-area { flex: 1; }
-.ticket-modal-actions { display: flex; gap: 8px; margin-left: 15px; }
+.ticket-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+.ticket-modal-title-area { flex: 1; min-width: 0; }
+.ticket-modal-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ticket-modal-actions .btn, .ticket-modal-actions .btn-resolve, .ticket-modal-actions .btn-postpone, .ticket-modal-actions .btn-close-action { height: 38px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
 @media (max-width: 900px) { .ticket-modal-body { grid-template-columns: 1fr; } }
 .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .modal-title { font-size: 16px; font-weight: 600; color: var(--primary-dark); }
@@ -308,16 +311,18 @@ tr:hover td { background: var(--bg); }
   <div class="page" id="page-users"><div class="topbar"><div class="topbar-title">🔐 Пользователи</div></div><div class="page-content"><div style="margin-bottom:15px;padding:12px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;border-left:3px solid #f59e0b">🔐 Режим администратора</div><div class="card"><table><thead><tr><th>ФИО</th><th>Телефон</th><th>Отдел</th><th>Роль</th><th>Пин-код</th><th>Создан</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></div>
   <div class="page" id="page-settings"><div class="topbar"><div class="topbar-title">⚙️ Настройки</div></div><div class="settings-layout"><div class="settings-nav"><div class="settings-nav-item active" data-settings="profile">Мой профиль</div><div class="settings-nav-item admin-only" data-settings="system">Система</div><div class="settings-nav-item admin-only" data-settings="categories">Категории</div><div class="settings-nav-item admin-only" data-settings="data">Данные</div></div><div class="settings-content" id="settingsContent"></div></div></div>
 </main>
+
+<!-- ✅ ИЗМЕНЁННОЕ МОДАЛЬНОЕ ОКНО ЗАЯВКИ (без крестика) -->
 <div class="modal" id="ticketViewModal">
   <div class="modal-content ticket-modal-content">
     <div class="ticket-modal-header">
       <div class="ticket-modal-title-area" id="ticketModalHeaderContent"></div>
       <div class="ticket-modal-actions" id="ticketModalActions"></div>
-      <button class="close-btn" onclick="window.closeTicketModal()">&times;</button>
     </div>
     <div class="ticket-modal-body" id="ticketModalBody"></div>
   </div>
 </div>
+
 <div class="modal" id="ticketModal"><div class="modal-content large"><div class="modal-header"><div class="modal-title" id="ticketModalTitle">Новая заявка</div><button class="close-btn" onclick="window.closeModal('ticketModal')">&times;</button></div><div class="modal-body"><form id="ticketForm" onsubmit="window.saveTicket(event)"><input type="hidden" id="ticketId"><div class="form-group"><label>Тема *</label><input type="text" id="ticketSubject" required></div><div class="form-row"><div class="form-group"><label>Заявитель *</label><select id="ticketClient" required></select></div><div class="form-group"><label>Категория</label><select id="ticketCategory"></select></div></div><div class="form-row"><div class="form-group"><label>Приоритет</label><select id="ticketPriority"><option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option><option value="urgent">Срочный</option></select></div><div class="form-group"><label>Исполнитель</label><select id="ticketAssignee"></select></div></div><div class="form-group"><label>Описание *</label><textarea id="ticketDescription" required></textarea></div><div class="recurrence-section"><div class="recurrence-header"><label><input type="checkbox" id="recurrenceEnabled" onchange="window.toggleRecurrenceConfig()">🔁 Сделать повторяющейся</label></div><div class="recurrence-config" id="recurrenceConfig"><div class="recurrence-presets"><button type="button" onclick="window.setRecurrencePreset('hourly', 1)">Каждый час</button><button type="button" onclick="window.setRecurrencePreset('hourly', 4)">Каждые 4 часа</button><button type="button" onclick="window.setRecurrencePreset('daily', 1)">Ежедневно</button><button type="button" onclick="window.setRecurrencePreset('weekly', 1)">Еженедельно</button><button type="button" onclick="window.setRecurrencePreset('monthly', 1)">Ежемесячно</button></div><div class="recurrence-grid"><div class="form-group" style="margin-bottom:0"><label>Интервал</label><input type="number" id="recurrenceInterval" value="1" min="1"></div><div class="form-group" style="margin-bottom:0"><label>Период</label><select id="recurrencePeriod"><option value="hourly">Часы</option><option value="daily" selected>Дни</option><option value="weekly">Недели</option><option value="monthly">Месяцы</option></select></div></div><div class="form-group" style="margin-top:10px;margin-bottom:0"><label>Первое выполнение</label><input type="datetime-local" id="recurrenceFirstRun"></div><div class="form-row" style="margin-top:10px"><div class="form-group" style="margin-bottom:0"><label>Окончание</label><input type="datetime-local" id="recurrenceEndDate"></div><div class="form-group" style="margin-bottom:0"><label>Макс. кол-во</label><input type="number" id="recurrenceMaxCount" min="1" placeholder="∞"></div></div></div></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('ticketModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('ticketForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="modal" id="postponeModal"><div class="modal-content" style="max-width:480px"><div class="modal-header"><div class="modal-title">⏸ Отложить</div><button class="close-btn" onclick="window.closeModal('postponeModal')">&times;</button></div><div class="modal-body"><div style="text-align:center;padding:10px 0"><div style="font-size:48px;margin-bottom:15px">⏸️</div><div style="font-size:14px;font-weight:500;margin-bottom:15px">Когда вернуться?</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:15px"><button class="btn btn-small" onclick="window.setPostponePreset(1)">1 час</button><button class="btn btn-small" onclick="window.setPostponePreset(4)">4 часа</button><button class="btn btn-small" onclick="window.setPostponePreset(24)">Завтра</button><button class="btn btn-small" onclick="window.setPostponePreset(168)">Неделя</button></div><input type="datetime-local" id="postponeDate" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;background:var(--card);color:var(--text)"><div style="margin-top:12px"><textarea id="postponeReason" placeholder="Причина" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;min-height:60px;background:var(--card);color:var(--text)"></textarea></div></div></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('postponeModal')">Отмена</button><button class="btn btn-warning" onclick="window.confirmPostpone()" style="color:white">⏸ Отложить</button></div></div></div>
 <div class="modal" id="clientModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="clientModalTitle">Новый заявитель</div><button class="close-btn" onclick="window.closeModal('clientModal')">&times;</button></div><div class="modal-body"><form id="clientForm" onsubmit="window.saveClient(event)"><input type="hidden" id="clientId"><div class="form-group"><label>Имя *</label><input type="text" id="clientName" required></div><div class="form-row"><div class="form-group"><label>Email *</label><input type="email" id="clientEmail" required></div><div class="form-group"><label>Телефон</label><input type="tel" id="clientPhone"></div></div><div class="form-group"><label>Компания</label><select id="clientCompany"></select></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('clientModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('clientForm').requestSubmit()">Сохранить</button></div></div></div>
@@ -623,7 +628,6 @@ function confirmPostpone() {
     }
 }
 
-// ✅ НОВЫЙ ПОРЯДОК: НОВЫЕ, МОИ, ВСЕ, В РАБОТЕ, ОЖИДАНИЕ, РЕШЁННЫЕ, АРХИВ
 function renderStatusCards() {
   const visible = getVisibleTickets();
   const all = visible.length;
@@ -723,6 +727,7 @@ function renderTickets() {
 
 function selectTicket(id) { const t = state.tickets.find(x => x.id === id); if (!t) return; if (!isAdmin() && t.assigneeId !== CURRENT_USER_ID) { toast('У вас нет доступа к этой заявке', 'error'); return; } selectedTicketId = id; openTicketViewModal(t); }
 
+// ✅ ИЗМЕНЁННАЯ ФУНКЦИЯ: кнопки выровнены, добавлена кнопка "Закрыть" вместо крестика
 function openTicketViewModal(t) {
     const client = getClient(t.clientId);
     const assignee = getUser(t.assigneeId);
@@ -734,19 +739,23 @@ function openTicketViewModal(t) {
     const isRecurringInstance = t.recurringParentId;
     const parentTicket = isRecurringInstance ? state.tickets.find(x => x.id === t.recurringParentId) : null;
 
-    let headerHtml = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--text-muted);font-family:monospace">' + t.number + '</span><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span><span class="badge-priority" style="background:' + (t.priority==='urgent'?'#fee2e2':t.priority==='high'?'#fef3c7':t.priority==='medium'?'#d1fae5':'#f3f4f6') + ';color:' + (t.priority==='urgent'?'#991b1b':t.priority==='high'?'#92400e':t.priority==='medium'?'#065f46':'#374151') + ';padding:1px 7px;border-radius:8px;font-size:10px">' + PRIORITY_LABELS[t.priority] + '</span>' + (isRecurringTemplate ? '<span class="recurring-indicator">🔁 Шаблон</span>' : '') + (isRecurringInstance ? '<span class="recurring-indicator" style="background:#f3e8ff;color:#6b21a8">📄 Экземпляр</span>' : '') + '</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">' + t.subject + '</div><div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-light)"><span>📅 ' + formatDateTime(t.createdAt) + '</span>' + (assignee ? '<span>🧑‍💼 ' + assignee.fullName + '</span>' : '<span style="color:var(--warning)">⚠ Не назначен</span>') + (cat ? '<span style="color:' + cat.color + '">● ' + cat.name + '</span>' : '') + '</div>';
+    let headerHtml = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--text-muted);font-family:monospace">' + t.number + '</span><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span><span class="badge-priority" style="background:' + (t.priority==='urgent'?'#fee2e2':t.priority==='high'?'#fef3c7':t.priority==='medium'?'#d1fae5':'#f3f4f6') + ';color:' + (t.priority==='urgent'?'#991b1b':t.priority==='high'?'#92400e':t.priority==='medium'?'#065f46':'#374151') + ';padding:1px 7px;border-radius:8px;font-size:10px">' + PRIORITY_LABELS[t.priority] + '</span>' + (isRecurringTemplate ? '<span class="recurring-indicator">🔁 Шаблон</span>' : '') + (isRecurringInstance ? '<span class="recurring-indicator" style="background:#f3e8ff;color:#6b21a8">📄 Экземпляр</span>' : '') + '</div><div style="font-size:18px;font-weight:600;margin-bottom:4px">' + t.subject + '</div><div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-light)"><span>📅 ' + formatDateTime(t.createdAt) + '</span>' + (assignee ? '<span>🧑‍💼 ' + assignee.fullName + '</span>' : '<span style="color:var(--warning)">⚠ Не назначен</span>') + (cat ? '<span style="color:' + cat.color + '">● ' + cat.name + '</span>' : '') + '</div>';
     document.getElementById('ticketModalHeaderContent').innerHTML = headerHtml;
 
+    // ✅ ВСЕ КНОПКИ В ОДНОМ РЯДУ, ВЫРОВНЕНЫ
     let actionsHtml = '';
     if (!isResolved) {
         actionsHtml += '<button class="btn btn-resolve" onclick="window.resolveTicketFromModal(\'' + t.id + '\')">✅ Выполнено</button>';
-        actionsHtml += '<button class="btn btn-postpone" onclick="window.openPostponeModal(\'' + t.id + '\')" style="color:white">⏸ Отложить</button>';
+        actionsHtml += '<button class="btn btn-postpone" onclick="window.openPostponeModal(\'' + t.id + '\')">⏸ Отложить</button>';
     } else {
-        actionsHtml += '<button class="btn btn-info btn-small" onclick="window.reopenTicketFromModal(\'' + t.id + '\')">🔓 Открыть заново</button>';
+        actionsHtml += '<button class="btn btn-info" onclick="window.reopenTicketFromModal(\'' + t.id + '\')">🔓 Открыть заново</button>';
     }
     if (isAdmin()) {
-        actionsHtml += '<button class="btn btn-danger btn-small" onclick="window.deleteTicketFromModal(\'' + t.id + '\')">🗑️ Удалить</button>';
+        actionsHtml += '<button class="btn btn-danger" onclick="window.deleteTicketFromModal(\'' + t.id + '\')">🗑️ Удалить</button>';
     }
+    // ✅ КНОПКА ЗАКРЫТЬ ВМЕСТО КРЕСТИКА
+    actionsHtml += '<button class="btn-close-action" onclick="window.closeTicketModal()">✕ Закрыть</button>';
+    
     document.getElementById('ticketModalActions').innerHTML = actionsHtml;
 
     let bannerHtml = '';
