@@ -225,25 +225,24 @@ tr:hover td { background: var(--bg); }
 @media (max-width: 1100px) { .status-cards { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 700px) { .status-cards { grid-template-columns: repeat(2, 1fr); } }
 
-/* Стили для портала заявителя */
 .client-portal { max-width: 900px; margin: 0 auto; padding: 30px; }
 .client-portal h1 { font-size: 28px; margin-bottom: 10px; color: var(--primary-dark); }
 .client-portal .intro { background: var(--card); padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
 .client-portal .intro p { margin-bottom: 10px; color: var(--text-light); line-height: 1.6; }
+.client-portal .intro .contract-info { background: #fef3c7; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #f59e0b; }
+.client-portal .intro .contract-info strong { color: #92400e; }
 .client-form { background: var(--card); padding: 30px; border-radius: 12px; border: 1px solid var(--border); }
 .client-form h2 { margin-bottom: 20px; color: var(--primary-dark); }
 .client-form .form-group { margin-bottom: 18px; }
 .client-form textarea { min-height: 120px; }
 .client-form .btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; margin-top: 10px; }
 .success-message { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; padding: 30px; border-radius: 12px; text-align: center; }
-.success-message h2 { margin-bottom: 15px; font-size: 24px; }
-.success-message p { margin-bottom: 12px; font-size: 15px; }
+.success-message h2 { margin-bottom: 15px; }
+.success-message p { margin-bottom: 12px; }
 .success-message .ticket-number { font-size: 20px; font-weight: 700; color: var(--primary-dark); background: white; padding: 8px 16px; border-radius: 8px; display: inline-block; margin: 10px 0; }
 .client-portal-footer { margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid var(--border); }
 .client-portal-footer a { color: var(--text-muted); font-size: 12px; text-decoration: none; }
 .client-portal-footer a:hover { color: var(--primary); }
-
-/* Личный кабинет заявителя */
 .client-dashboard { max-width: 1000px; margin: 0 auto; padding: 30px; }
 .client-dashboard-header { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .client-dashboard-header h2 { color: var(--primary-dark); }
@@ -264,7 +263,7 @@ tr:hover td { background: var(--bg); }
 </head>
 <body>
 
-<!-- ПОРТАЛ ЗАЯВИТЕЛЯ (Главная страница) -->
+<!-- ПОРТАЛ ЗАЯВИТЕЛЯ -->
 <div class="client-portal" id="clientPortal">
   <div style="text-align:center;margin-bottom:30px">
     <div style="font-size:64px;margin-bottom:10px">🎪</div>
@@ -275,7 +274,11 @@ tr:hover td { background: var(--bg); }
   <div class="intro">
     <p><strong>Добро пожаловать!</strong></p>
     <p>Здесь вы можете создать заявку и отслеживать её статус. После отправки заявки с вами свяжется наш специалист.</p>
-    <p style="margin-top:15px;padding-top:15px;border-top:1px solid var(--border)"><strong>📞 Уже есть заявка?</strong> Войдите в личный кабинет по номеру телефона и паролю, которые вы указали при создании первой заявки.</p>
+    <div class="contract-info">
+      <p><strong>📄 Вход по номеру договора</strong></p>
+      <p>Для создания заявки и входа в личный кабинет используется номер договора в формате <strong>ND11-111111</strong></p>
+      <p style="margin-top:10px;font-size:13px">Если у вас ещё нет договора — обратитесь к администратору для его создания.</p>
+    </div>
   </div>
 
   <div id="clientFormSection">
@@ -288,9 +291,8 @@ tr:hover td { background: var(--bg); }
             <input type="text" id="publicClientName" required placeholder="Иванов Иван">
           </div>
           <div class="form-group">
-            <label>Телефон (логин) *</label>
-            <input type="tel" id="publicClientPhone" required placeholder="+79121234567 или 89121234567" pattern="[\+]?[0-9\s\-\(\)]{10,}">
-            <div class="form-hint">Формат: +79121234567 или 89121234567</div>
+            <label>Телефон *</label>
+            <input type="tel" id="publicClientPhone" required placeholder="+7 900 123-45-67">
           </div>
         </div>
         
@@ -301,8 +303,8 @@ tr:hover td { background: var(--bg); }
 
         <div class="form-group">
           <label>Номер договора *</label>
-          <input type="text" id="publicContractNumber" required placeholder="Например: Д-2024-001">
-          <div class="form-hint">Укажите номер вашего договора с нами</div>
+          <input type="text" id="publicContractNumber" required placeholder="ND11-111111" pattern="ND\d{2}-\d{6}">
+          <div class="form-hint">Формат: ND11-111111 (ND + 2 цифры + дефис + 6 цифр)</div>
         </div>
 
         <div class="form-group" id="passwordField" style="display:none">
@@ -350,7 +352,7 @@ tr:hover td { background: var(--bg); }
       <p>Номер вашей заявки:</p>
       <div class="ticket-number" id="createdTicketNumber"></div>
       <p>Наш специалист свяжется с вами в ближайшее время.</p>
-      <p style="margin-top:20px;font-size:13px"><strong>Сохраните ваши данные для входа:</strong><br>Логин: <span id="savedPhone"></span><br>Пароль: <span id="savedPassword"></span></p>
+      <p style="margin-top:20px;font-size:13px"><strong>Сохраните ваши данные для входа:</strong><br>Номер договора: <span id="savedContract"></span><br>Пароль: <span id="savedPassword"></span></p>
       <button class="btn btn-primary" onclick="window.resetClientForm()" style="margin-top:20px">📝 Создать ещё одну заявку</button>
       <button class="btn" onclick="window.showClientLogin()" style="margin-top:10px">🔐 Войти в личный кабинет</button>
     </div>
@@ -373,8 +375,9 @@ tr:hover td { background: var(--bg); }
     <h2>Войти</h2>
     <form onsubmit="window.clientLogin(event)">
       <div class="form-group">
-        <label>Номер телефона (логин) *</label>
-        <input type="tel" id="clientLoginPhone" required placeholder="+79121234567">
+        <label>Номер договора *</label>
+        <input type="text" id="clientLoginContract" required placeholder="ND11-111111" pattern="ND\d{2}-\d{6}">
+        <div class="form-hint">Формат: ND11-111111</div>
       </div>
       <div class="form-group">
         <label>Пароль *</label>
@@ -446,6 +449,7 @@ tr:hover td { background: var(--bg); }
     <div class="nav-section-title">Управление</div>
     <div class="nav-item" data-page="clients"><span class="nav-icon">👥</span><span>Заявители</span></div>
     <div class="nav-item" data-page="companies"><span class="nav-icon">🏢</span><span>Компании</span></div>
+    <div class="nav-item" data-page="contracts"><span class="nav-icon">📄</span><span>Договоры</span></div>
     <div class="nav-item" data-page="staff"><span class="nav-icon">🧑‍💼</span><span>Сотрудники</span></div>
   </div>
   <div class="nav-section">
@@ -487,6 +491,7 @@ tr:hover td { background: var(--bg); }
   <div class="page" id="page-dashboard"><div class="topbar"><div class="topbar-title">📊 Дашборд</div></div><div class="reports-content" id="dashboardContent"></div></div>
   <div class="page" id="page-clients"><div class="topbar"><div class="topbar-title">👥 Заявители</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openClientModal()">+ Заявитель</button></div></div><div class="page-content"><div class="card"><table><thead><tr><th>Заявитель</th><th>Email</th><th>Телефон</th><th>Договор</th><th>Заявок</th><th>Действия</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div></div>
   <div class="page" id="page-companies"><div class="topbar"><div class="topbar-title">🏢 Компании</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openCompanyModal()">+ Компания</button></div></div><div class="page-content"><div class="card"><table><thead><tr><th>Компания</th><th>Домен</th><th>Заявителей</th><th>Заявок</th><th>Действия</th></tr></thead><tbody id="companiesTable"></tbody></table></div></div></div>
+  <div class="page" id="page-contracts"><div class="topbar"><div class="topbar-title">📄 Договоры</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openContractModal()">+ Договор</button></div></div><div class="page-content"><div class="card"><table><thead><tr><th>Номер</th><th>Название</th><th>Заявитель</th><th>Начало</th><th>Окончание</th><th>Статус</th><th>Действия</th></tr></thead><tbody id="contractsTable"></tbody></table></div></div></div>
   <div class="page" id="page-staff"><div class="topbar"><div class="topbar-title">🧑‍💼 Сотрудники</div></div><div class="page-content"><div class="card"><table><thead><tr><th>Сотрудник</th><th>Телефон</th><th>Отдел</th><th>Роль</th><th>Открытых</th><th>Решено</th></tr></thead><tbody id="staffTable"></tbody></table></div></div></div>
   <div class="page" id="page-reports"><div class="topbar"><div class="topbar-title">📈 Отчёты</div></div><div class="reports-content" id="reportsContent"></div></div>
   <div class="page" id="page-departments"><div class="topbar"><div class="topbar-title">🏛 Отделы</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openDepartmentModal()">+ Отдел</button></div></div><div class="page-content"><div id="departmentsList"></div></div></div>
@@ -506,8 +511,9 @@ tr:hover td { background: var(--bg); }
 
 <div class="modal" id="ticketModal"><div class="modal-content large"><div class="modal-header"><div class="modal-title" id="ticketModalTitle">Новая заявка</div><button class="close-btn" onclick="window.closeModal('ticketModal')">&times;</button></div><div class="modal-body"><form id="ticketForm" onsubmit="window.saveTicket(event)"><input type="hidden" id="ticketId"><div class="form-group"><label>Тема *</label><input type="text" id="ticketSubject" required></div><div class="form-row"><div class="form-group"><label>Заявитель *</label><select id="ticketClient" required></select></div><div class="form-group"><label>Категория</label><select id="ticketCategory"></select></div></div><div class="form-row"><div class="form-group"><label>Приоритет</label><select id="ticketPriority"><option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option><option value="urgent">Срочный</option></select></div><div class="form-group"><label>Исполнитель</label><select id="ticketAssignee"></select></div></div><div class="form-group"><label>Описание *</label><textarea id="ticketDescription" required></textarea></div><div class="recurrence-section"><div class="recurrence-header"><label><input type="checkbox" id="recurrenceEnabled" onchange="window.toggleRecurrenceConfig()">🔁 Сделать повторяющейся</label></div><div class="recurrence-config" id="recurrenceConfig"><div class="recurrence-presets"><button type="button" onclick="window.setRecurrencePreset('hourly', 1)">Каждый час</button><button type="button" onclick="window.setRecurrencePreset('hourly', 4)">Каждые 4 часа</button><button type="button" onclick="window.setRecurrencePreset('daily', 1)">Ежедневно</button><button type="button" onclick="window.setRecurrencePreset('weekly', 1)">Еженедельно</button><button type="button" onclick="window.setRecurrencePreset('monthly', 1)">Ежемесячно</button></div><div class="recurrence-grid"><div class="form-group" style="margin-bottom:0"><label>Интервал</label><input type="number" id="recurrenceInterval" value="1" min="1"></div><div class="form-group" style="margin-bottom:0"><label>Период</label><select id="recurrencePeriod"><option value="hourly">Часы</option><option value="daily" selected>Дни</option><option value="weekly">Недели</option><option value="monthly">Месяцы</option></select></div></div><div class="form-group" style="margin-top:10px;margin-bottom:0"><label>Первое выполнение</label><input type="datetime-local" id="recurrenceFirstRun"></div><div class="form-row" style="margin-top:10px"><div class="form-group" style="margin-bottom:0"><label>Окончание</label><input type="datetime-local" id="recurrenceEndDate"></div><div class="form-group" style="margin-bottom:0"><label>Макс. кол-во</label><input type="number" id="recurrenceMaxCount" min="1" placeholder="∞"></div></div></div></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('ticketModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('ticketForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="modal" id="postponeModal"><div class="modal-content" style="max-width:480px"><div class="modal-header"><div class="modal-title">⏸ Отложить</div><button class="close-btn" onclick="window.closeModal('postponeModal')">&times;</button></div><div class="modal-body"><div style="text-align:center;padding:10px 0"><div style="font-size:48px;margin-bottom:15px">⏸️</div><div style="font-size:14px;font-weight:500;margin-bottom:15px">Когда вернуться?</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:15px"><button class="btn btn-small" onclick="window.setPostponePreset(1)">1 час</button><button class="btn btn-small" onclick="window.setPostponePreset(4)">4 часа</button><button class="btn btn-small" onclick="window.setPostponePreset(24)">Завтра</button><button class="btn btn-small" onclick="window.setPostponePreset(168)">Неделя</button></div><input type="datetime-local" id="postponeDate" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;background:var(--card);color:var(--text)"><div style="margin-top:12px"><textarea id="postponeReason" placeholder="Причина" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px;font-family:inherit;min-height:60px;background:var(--card);color:var(--text)"></textarea></div></div></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('postponeModal')">Отмена</button><button class="btn btn-warning" onclick="window.confirmPostpone()" style="color:white">⏸ Отложить</button></div></div></div>
-<div class="modal" id="clientModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="clientModalTitle">Новый заявитель</div><button class="close-btn" onclick="window.closeModal('clientModal')">&times;</button></div><div class="modal-body"><form id="clientForm" onsubmit="window.saveClient(event)"><input type="hidden" id="clientId"><div class="form-group"><label>Имя *</label><input type="text" id="clientName" required></div><div class="form-row"><div class="form-group"><label>Email *</label><input type="email" id="clientEmail" required></div><div class="form-group"><label>Телефон</label><input type="tel" id="clientPhone"></div></div><div class="form-group"><label>Номер договора</label><input type="text" id="clientContract"></div><div class="form-group"><label>Компания</label><select id="clientCompany"></select></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('clientModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('clientForm').requestSubmit()">Сохранить</button></div></div></div>
+<div class="modal" id="clientModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="clientModalTitle">Новый заявитель</div><button class="close-btn" onclick="window.closeModal('clientModal')">&times;</button></div><div class="modal-body"><form id="clientForm" onsubmit="window.saveClient(event)"><input type="hidden" id="clientId"><div class="form-group"><label>Имя *</label><input type="text" id="clientName" required></div><div class="form-row"><div class="form-group"><label>Email *</label><input type="email" id="clientEmail" required></div><div class="form-group"><label>Телефон</label><input type="tel" id="clientPhone"></div></div><div class="form-group"><label>Компания</label><select id="clientCompany"></select></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('clientModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('clientForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="modal" id="companyModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="companyModalTitle">Новая компания</div><button class="close-btn" onclick="window.closeModal('companyModal')">&times;</button></div><div class="modal-body"><form id="companyForm" onsubmit="window.saveCompany(event)"><input type="hidden" id="companyId"><div class="form-group"><label>Название *</label><input type="text" id="companyName" required></div><div class="form-group"><label>Домен</label><input type="text" id="companyDomain"></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('companyModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('companyForm').requestSubmit()">Сохранить</button></div></div></div>
+<div class="modal" id="contractModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="contractModalTitle">Новый договор</div><button class="close-btn" onclick="window.closeModal('contractModal')">&times;</button></div><div class="modal-body"><form id="contractForm" onsubmit="window.saveContract(event)"><input type="hidden" id="contractId"><div class="form-group"><label>Номер договора *</label><input type="text" id="contractNumber" required placeholder="ND11-111111" pattern="ND\d{2}-\d{6}"><div class="form-hint">Формат: ND + 2 цифры + дефис + 6 цифр</div></div><div class="form-group"><label>Название *</label><input type="text" id="contractName" required placeholder="Например: Договор на обслуживание"></div><div class="form-group"><label>Заявитель *</label><select id="contractClient" required></select></div><div class="form-row"><div class="form-group"><label>Дата начала *</label><input type="date" id="contractStartDate" required></div><div class="form-group"><label>Дата окончания *</label><input type="date" id="contractEndDate" required></div></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('contractModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('contractForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="modal" id="departmentModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="departmentModalTitle">Новый отдел</div><button class="close-btn" onclick="window.closeModal('departmentModal')">&times;</button></div><div class="modal-body"><form id="departmentForm" onsubmit="window.saveDepartment(event)"><input type="hidden" id="departmentId"><div class="form-group"><label>Название *</label><input type="text" id="departmentName" required></div><div class="form-group"><label>Описание</label><textarea id="departmentDescription"></textarea></div><div class="form-group"><label>Цвет</label><input type="color" id="departmentColor" value="#10b981" style="height:40px;cursor:pointer"></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('departmentModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('departmentForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="modal" id="userModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="userModalTitle">Редактировать</div><button class="close-btn" onclick="window.closeModal('userModal')">&times;</button></div><div class="modal-body"><form id="userForm" onsubmit="window.saveUser(event)"><input type="hidden" id="userId"><div class="form-group"><label>ФИО *</label><input type="text" id="userFullName" required></div><div class="form-group"><label>Телефон *</label><input type="tel" id="userPhone" required></div><div class="form-group"><label>Отдел</label><select id="userDepartment"></select></div><div class="form-group"><label>Роль</label><select id="userRole"><option value="staff">Сотрудник</option><option value="admin">Администратор</option></select></div><div class="form-group"><label>Новый пин-код (4 цифры)</label><input type="password" id="userPin" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div></form></div><div class="modal-footer"><button class="btn" onclick="window.closeModal('userModal')">Отмена</button><button class="btn btn-primary" onclick="document.getElementById('userForm').requestSubmit()">Сохранить</button></div></div></div>
 <div class="toast" id="toast"></div>
@@ -534,6 +540,7 @@ let state = {
   departments: JSON.parse(localStorage.getItem('hd_departments')) || [], 
   clients: JSON.parse(localStorage.getItem('hd_clients')) || [], 
   companies: JSON.parse(localStorage.getItem('hd_companies')) || [], 
+  contracts: JSON.parse(localStorage.getItem('hd_contracts')) || [], 
   tickets: JSON.parse(localStorage.getItem('hd_tickets')) || [], 
   categories: JSON.parse(localStorage.getItem('hd_categories')) || [], 
   settings: JSON.parse(localStorage.getItem('hd_settings')) || { theme: 'light', companyName: 'Ярмарка CRM', autoArchiveHours: 24, soundEnabled: true, defaultAssigneeId: '' }, 
@@ -542,7 +549,7 @@ let state = {
 };
 
 let CURRENT_USER_ID = null, selectedTicketId = null, currentFilter = 'new', postponeTicketId = null, selectedLoginUserId = null;
-let CURRENT_CLIENT_ID = null;
+let CURRENT_CLIENT_ID = null, CURRENT_CONTRACT_ID = null;
 const STATUS_LABELS = { new: 'Новая', open: 'В работе', pending: 'Ожидание', solved: 'Решена', closed: 'Архив' };
 const PRIORITY_LABELS = { low: 'Низкий', medium: 'Средний', high: 'Высокий', urgent: 'Срочный' };
 const ROLE_LABELS = { admin: 'Администратор', staff: 'Сотрудник' };
@@ -553,7 +560,7 @@ async function saveToFirebase() {
   try {
     await setDoc(doc(db, 'crm_data', 'main'), {
       users: state.users, departments: state.departments, clients: state.clients,
-      companies: state.companies, tickets: state.tickets, categories: state.categories,
+      companies: state.companies, contracts: state.contracts, tickets: state.tickets, categories: state.categories,
       settings: state.settings, updatedAt: new Date().toISOString()
     });
     console.log('✅ Сохранено в Firebase');
@@ -571,6 +578,7 @@ async function loadFromFirebase() {
         state.departments = d.departments || state.departments;
         state.clients = d.clients || state.clients;
         state.companies = d.companies || state.companies;
+        state.contracts = d.contracts || state.contracts || [];
         state.tickets = d.tickets || state.tickets;
         state.categories = d.categories || state.categories;
         state.settings = d.settings || state.settings;
@@ -595,6 +603,7 @@ function save() {
   localStorage.setItem('hd_departments', JSON.stringify(state.departments));
   localStorage.setItem('hd_clients', JSON.stringify(state.clients));
   localStorage.setItem('hd_companies', JSON.stringify(state.companies));
+  localStorage.setItem('hd_contracts', JSON.stringify(state.contracts));
   localStorage.setItem('hd_tickets', JSON.stringify(state.tickets));
   localStorage.setItem('hd_categories', JSON.stringify(state.categories));
   localStorage.setItem('hd_settings', JSON.stringify(state.settings));
@@ -607,11 +616,13 @@ function save() {
 
 function getUser(id) { return state.users.find(u => u.id === id); }
 function getClient(id) { return state.clients.find(c => c.id === id); }
+function getContract(id) { return state.contracts.find(c => c.id === id); }
 function getCompany(id) { return state.companies.find(c => c.id === id); }
 function getCategory(id) { return state.categories.find(c => c.id === id); }
 function getDepartment(id) { return state.departments.find(d => d.id === id); }
 function getCurrentUser() { return getUser(CURRENT_USER_ID); }
 function getCurrentClient() { return getClient(CURRENT_CLIENT_ID); }
+function getCurrentContract() { return getContract(CURRENT_CONTRACT_ID); }
 function isAdmin() { const u = getCurrentUser(); return u && u.role === 'admin'; }
 function getInitials(name) { if (!name) return '?'; const parts = name.split(' ').filter(Boolean); if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase(); return parts[0].slice(0, 2).toUpperCase(); }
 function formatDate(iso) { if (!iso) return '—'; const d = new Date(iso); const diff = (Date.now() - d) / 1000; if (diff < 60) return 'только что'; if (diff < 3600) return Math.floor(diff/60) + ' мин'; if (diff < 86400) return Math.floor(diff/3600) + ' ч'; if (diff < 86400*7) return Math.floor(diff/86400) + ' дн'; return d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short' }); }
@@ -690,16 +701,9 @@ function updateAllCounters() {
 
 // ✅ ФУНКЦИИ ДЛЯ ЗАЯВИТЕЛЕЙ
 
-// Проверка формата телефона
-function normalizePhone(phone) {
-  // Убираем все кроме цифр
-  let digits = phone.replace(/\D/g, '');
-  // Если начинается с 8, заменяем на 7
-  if (digits.startsWith('8')) digits = '7' + digits.substring(1);
-  // Если не начинается с 7, добавляем 7
-  if (!digits.startsWith('7')) digits = '7' + digits;
-  // Возвращаем в формате +7...
-  return '+' + digits;
+// Проверка формата номера договора
+function isValidContractNumber(number) {
+  return /^ND\d{2}-\d{6}$/.test(number);
 }
 
 // Создание заявки заявителем
@@ -709,7 +713,7 @@ window.createPublicTicket = async function(e) {
   const name = document.getElementById('publicClientName').value.trim();
   const phone = document.getElementById('publicClientPhone').value.trim();
   const email = document.getElementById('publicClientEmail').value.trim();
-  const contractNumber = document.getElementById('publicContractNumber').value.trim();
+  const contractNumber = document.getElementById('publicContractNumber').value.trim().toUpperCase();
   const password = document.getElementById('publicClientPassword').value;
   const subject = document.getElementById('publicTicketSubject').value.trim();
   const category = document.getElementById('publicTicketCategory').value;
@@ -721,11 +725,29 @@ window.createPublicTicket = async function(e) {
     return;
   }
   
-  // Нормализуем телефон
-  const normalizedPhone = normalizePhone(phone);
+  if (!isValidContractNumber(contractNumber)) {
+    toast('Неверный формат номера договора. Используйте формат ND11-111111', 'error');
+    return;
+  }
   
-  // Ищем заявителя по телефону
-  let client = state.clients.find(c => c.phone === normalizedPhone);
+  // Ищем договор
+  const contract = state.contracts.find(c => c.number === contractNumber);
+  
+  if (!contract) {
+    toast('Договор не найден в базе. Обратитесь к администратору.', 'error');
+    return;
+  }
+  
+  // Проверяем срок действия договора
+  const now = new Date();
+  const endDate = new Date(contract.endDate);
+  if (now > endDate) {
+    toast('Срок действия договора истёк. Обратитесь к администратору для продления.', 'error');
+    return;
+  }
+  
+  // Ищем заявителя по договору
+  let client = state.clients.find(c => c.contractId === contract.id);
   let isNewClient = false;
   
   if (!client) {
@@ -740,8 +762,9 @@ window.createPublicTicket = async function(e) {
       id: 'c' + Date.now(),
       name: name,
       email: email,
-      phone: normalizedPhone,
-      password: password, // В реальном проекте нужно хешировать!
+      phone: phone,
+      password: password,
+      contractId: contract.id,
       contractNumber: contractNumber,
       companyId: null,
       createdAt: new Date().toISOString()
@@ -756,7 +779,7 @@ window.createPublicTicket = async function(e) {
     // Обновляем данные если изменились
     if (name) client.name = name;
     if (email) client.email = email;
-    if (contractNumber) client.contractNumber = contractNumber;
+    if (phone) client.phone = phone;
   }
   
   // Получаем ответственного из настроек
@@ -770,6 +793,7 @@ window.createPublicTicket = async function(e) {
     subject: subject,
     description: description,
     clientId: client.id,
+    contractId: contract.id,
     contractNumber: contractNumber,
     category: category,
     priority: priority,
@@ -802,7 +826,7 @@ window.createPublicTicket = async function(e) {
   document.getElementById('clientFormSection').style.display = 'none';
   document.getElementById('clientSuccessSection').style.display = 'block';
   document.getElementById('createdTicketNumber').textContent = newTicket.number;
-  document.getElementById('savedPhone').textContent = normalizedPhone;
+  document.getElementById('savedContract').textContent = contractNumber;
   document.getElementById('savedPassword').textContent = isNewClient ? password : '••••••';
   
   toast('✅ Заявка создана!');
@@ -829,24 +853,46 @@ window.showClientPortal = function() {
 window.clientLogin = function(e) {
   e.preventDefault();
   
-  const phone = document.getElementById('clientLoginPhone').value.trim();
+  const contractNumber = document.getElementById('clientLoginContract').value.trim().toUpperCase();
   const password = document.getElementById('clientLoginPassword').value;
   
-  const normalizedPhone = normalizePhone(phone);
-  const client = state.clients.find(c => c.phone === normalizedPhone);
+  if (!isValidContractNumber(contractNumber)) {
+    toast('Неверный формат номера договора', 'error');
+    return;
+  }
+  
+  // Ищем договор
+  const contract = state.contracts.find(c => c.number === contractNumber);
+  
+  if (!contract) {
+    toast('Договор не найден в базе', 'error');
+    return;
+  }
+  
+  // Проверяем срок действия
+  const now = new Date();
+  const endDate = new Date(contract.endDate);
+  if (now > endDate) {
+    toast('Срок действия договора истёк', 'error');
+    return;
+  }
+  
+  // Ищем заявителя по договору
+  const client = state.clients.find(c => c.contractId === contract.id);
   
   if (!client) {
-    toast('Заявитель не найден. Проверьте номер телефона.', 'error');
+    toast('Заявитель не найден. Создайте первую заявку.', 'error');
     return;
   }
   
   if (client.password !== password) {
-    toast('Неверный пароль.', 'error');
+    toast('Неверный пароль', 'error');
     return;
   }
   
   CURRENT_CLIENT_ID = client.id;
-  state.clientSession = { clientId: client.id, loginAt: new Date().toISOString() };
+  CURRENT_CONTRACT_ID = contract.id;
+  state.clientSession = { clientId: client.id, contractId: contract.id, loginAt: new Date().toISOString() };
   save();
   
   toast('👋 Добро пожаловать, ' + client.name + '!');
@@ -860,9 +906,10 @@ function showClientDashboard() {
   document.getElementById('clientDashboard').style.display = 'block';
   
   const client = getCurrentClient();
+  const contract = getCurrentContract();
   if (client) {
     document.getElementById('clientDashboardName').textContent = client.name;
-    document.getElementById('clientDashboardContract').textContent = client.contractNumber || 'Не указан';
+    document.getElementById('clientDashboardContract').textContent = contract ? contract.number : 'Не указан';
   }
   
   renderClientTickets();
@@ -996,6 +1043,7 @@ window.backToClientTickets = function() {
 window.clientLogout = function() {
   if (!confirm('Выйти из личного кабинета?')) return;
   CURRENT_CLIENT_ID = null;
+  CURRENT_CONTRACT_ID = null;
   state.clientSession = null;
   save();
   document.getElementById('clientDashboard').style.display = 'none';
@@ -1004,18 +1052,24 @@ window.clientLogout = function() {
 
 // Показывать поле пароля только для новых заявителей
 document.addEventListener('input', function(e) {
-  if (e.target.id === 'publicClientPhone') {
-    const phone = e.target.value.trim();
-    const normalizedPhone = normalizePhone(phone);
-    const existingClient = state.clients.find(c => c.phone === normalizedPhone);
-    
-    const passwordField = document.getElementById('passwordField');
-    if (existingClient) {
-      passwordField.style.display = 'none';
-      document.getElementById('publicClientPassword').required = false;
-    } else {
-      passwordField.style.display = 'block';
-      document.getElementById('publicClientPassword').required = true;
+  if (e.target.id === 'publicContractNumber') {
+    const contractNumber = e.target.value.trim().toUpperCase();
+    if (isValidContractNumber(contractNumber)) {
+      const contract = state.contracts.find(c => c.number === contractNumber);
+      if (contract) {
+        const existingClient = state.clients.find(c => c.contractId === contract.id);
+        const passwordField = document.getElementById('passwordField');
+        if (existingClient) {
+          passwordField.style.display = 'none';
+          document.getElementById('publicClientPassword').required = false;
+        } else {
+          passwordField.style.display = 'block';
+          document.getElementById('publicClientPassword').required = true;
+        }
+      } else {
+        document.getElementById('passwordField').style.display = 'none';
+        document.getElementById('publicClientPassword').required = false;
+      }
     }
   }
 });
@@ -1098,7 +1152,7 @@ function renderRegDepartments() { document.getElementById('regDepartment').inner
 document.addEventListener('input', e => { if (e.target.classList && e.target.classList.contains('pin-input')) { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); } });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') { if (document.getElementById('loginForm').classList.contains('active')) doLogin(); else if (document.getElementById('registerForm').classList.contains('active')) doRegister(); } if (e.key === 'Escape' && document.getElementById('ticketViewModal')?.classList.contains('active')) { closeTicketModal(); } });
 
-document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active'); const page = item.dataset.page; document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-' + page).classList.add('active'); if (page === 'dashboard') renderDashboard(); if (page === 'clients') renderClients(); if (page === 'companies') renderCompanies(); if (page === 'staff') renderStaff(); if (page === 'reports') renderReports(); if (page === 'tickets') renderTickets(); if (page === 'recurring') renderRecurring(); if (page === 'departments') renderDepartments(); if (page === 'users') renderUsers(); if (page === 'settings') renderSettings(); }); });
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active'); const page = item.dataset.page; document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-' + page).classList.add('active'); if (page === 'dashboard') renderDashboard(); if (page === 'clients') renderClients(); if (page === 'companies') renderCompanies(); if (page === 'contracts') renderContracts(); if (page === 'staff') renderStaff(); if (page === 'reports') renderReports(); if (page === 'tickets') renderTickets(); if (page === 'recurring') renderRecurring(); if (page === 'departments') renderDepartments(); if (page === 'users') renderUsers(); if (page === 'settings') renderSettings(); }); });
 
 window.showStaffLogin = function() {
   document.getElementById('clientPortal').style.display = 'none';
@@ -1481,10 +1535,87 @@ function saveTicket(e) {
 
 function renderRecurring() { const list = document.getElementById('recurringList'); const templates = state.tickets.filter(t => t.recurrence); if (templates.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔁</div><p>Нет повторяющихся заявок</p></div>'; return; } list.innerHTML = templates.map(t => { const rec = t.recurrence; const client = getClient(t.clientId); const agent = getUser(t.assigneeId); const dep = agent ? getDepartment(agent.departmentId) : null; const instances = state.tickets.filter(x => x.recurringParentId === t.id).length; return '<div class="card" style="margin-bottom:12px;padding:15px;border-left:3px solid #8b5cf6"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-size:18px">🔁</span><strong style="font-size:14px;color:var(--primary-dark)">' + t.subject + '</strong><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (rec.enabled ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">АКТИВНО</span>' : '<span style="background:#e5e7eb;color:#374151;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">ПРИОСТАНОВЛЕНО</span>') + '</div><div style="font-size:11px;color:var(--text-light);display:flex;gap:12px;flex-wrap:wrap"><span>📋 ' + t.number + '</span><span>👤 ' + (client ? client.name : '—') + '</span><span>🧑‍💼 ' + (agent ? agent.fullName : 'Не назначен') + '</span>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '<span>🔁 <strong>' + formatRecurrence(rec) + '</strong></span><span>📄 Экземпляров: <strong>' + (rec.currentCount || 0) + '</strong></span></div><div style="font-size:11px;color:var(--text-light);margin-top:5px">' + (rec.lastRunAt ? 'Последнее: ' + formatDateTime(rec.lastRunAt) + ' • ' : '') + (rec.nextRunAt ? 'Следующее: <strong>' + formatDateTime(rec.nextRunAt) + '</strong>' : '') + '</div></div><div style="display:flex;gap:5px;align-items:center"><button class="btn btn-small" onclick="window.selectTicket(\'' + t.id + '\')">👁 Открыть</button><button class="btn btn-small" onclick="window.toggleRecurrence(\'' + t.id + '\')">' + (rec.enabled ? '⏸ Пауза' : '▶ Старт') + '</button></div></div></div>'; }).join(''); }
 
-function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; const company = c.companyId ? getCompany(c.companyId) : null; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + '</td><td>' + c.email + '</td><td>' + (c.phone || '—') + '</td><td>' + (c.contractNumber || '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
-function openClientModal(id) { document.getElementById('clientForm').reset(); document.getElementById('clientId').value = ''; document.getElementById('clientModalTitle').textContent = 'Новый заявитель'; document.getElementById('clientCompany').innerHTML = '<option value="">Без компании</option>' + state.companies.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (id) { const c = getClient(id); document.getElementById('clientId').value = c.id; document.getElementById('clientName').value = c.name; document.getElementById('clientEmail').value = c.email; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientContract').value = c.contractNumber || ''; document.getElementById('clientCompany').value = c.companyId || ''; document.getElementById('clientModalTitle').textContent = 'Редактировать'; } openModal('clientModal'); }
-function saveClient(e) { e.preventDefault(); const id = document.getElementById('clientId').value; const data = { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, contractNumber: document.getElementById('clientContract').value, companyId: document.getElementById('clientCompany').value }; if (id) Object.assign(getClient(id), data); else state.clients.push({ id: 'c' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('clientModal'); renderClients(); updateAllCounters(); }
+function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const contract = c.contractId ? getContract(c.contractId) : null; const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; const company = c.companyId ? getCompany(c.companyId) : null; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + '</td><td>' + c.email + '</td><td>' + (c.phone || '—') + '</td><td>' + (contract ? contract.number : '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
+function openClientModal(id) { document.getElementById('clientForm').reset(); document.getElementById('clientId').value = ''; document.getElementById('clientModalTitle').textContent = 'Новый заявитель'; document.getElementById('clientCompany').innerHTML = '<option value="">Без компании</option>' + state.companies.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (id) { const c = getClient(id); document.getElementById('clientId').value = c.id; document.getElementById('clientName').value = c.name; document.getElementById('clientEmail').value = c.email; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientCompany').value = c.companyId || ''; document.getElementById('clientModalTitle').textContent = 'Редактировать'; } openModal('clientModal'); }
+function saveClient(e) { e.preventDefault(); const id = document.getElementById('clientId').value; const data = { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, companyId: document.getElementById('clientCompany').value }; if (id) Object.assign(getClient(id), data); else state.clients.push({ id: 'c' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('clientModal'); renderClients(); updateAllCounters(); }
 function deleteClient(id) { if (!confirm('Удалить?')) return; state.clients = state.clients.filter(c => c.id !== id); save(); renderClients(); updateAllCounters(); }
+
+// ✅ ФУНКЦИИ ДЛЯ УПРАВЛЕНИЯ ДОГОВОРАМИ
+function renderContracts() {
+  const tbody = document.getElementById('contractsTable');
+  if (state.contracts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>Нет договоров</p></div></td></tr>';
+    return;
+  }
+  const now = new Date();
+  tbody.innerHTML = state.contracts.map(c => {
+    const client = c.clientId ? getClient(c.clientId) : null;
+    const endDate = new Date(c.endDate);
+    const isActive = now <= endDate;
+    return '<tr><td><strong>' + c.number + '</strong></td><td>' + c.name + '</td><td>' + (client ? client.name : '—') + '</td><td>' + formatDate(c.startDate) + '</td><td>' + formatDate(c.endDate) + '</td><td><span class="badge-status ' + (isActive ? 'status-new' : 'status-closed') + '">' + (isActive ? 'Активен' : 'Истёк') + '</span></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openContractModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteContract(\'' + c.id + '\')">🗑️</button></td></tr>';
+  }).join('');
+}
+
+window.openContractModal = function(id) {
+  document.getElementById('contractForm').reset();
+  document.getElementById('contractId').value = '';
+  document.getElementById('contractModalTitle').textContent = 'Новый договор';
+  document.getElementById('contractClient').innerHTML = '<option value="">Выберите заявителя</option>' + state.clients.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
+  if (id) {
+    const c = getContract(id);
+    document.getElementById('contractId').value = c.id;
+    document.getElementById('contractNumber').value = c.number;
+    document.getElementById('contractName').value = c.name;
+    document.getElementById('contractClient').value = c.clientId || '';
+    document.getElementById('contractStartDate').value = c.startDate ? c.startDate.split('T')[0] : '';
+    document.getElementById('contractEndDate').value = c.endDate ? c.endDate.split('T')[0] : '';
+    document.getElementById('contractModalTitle').textContent = 'Редактировать договор';
+  }
+  openModal('contractModal');
+};
+
+window.saveContract = function(e) {
+  e.preventDefault();
+  const id = document.getElementById('contractId').value;
+  const number = document.getElementById('contractNumber').value.trim().toUpperCase();
+  const name = document.getElementById('contractName').value.trim();
+  const clientId = document.getElementById('contractClient').value;
+  const startDate = document.getElementById('contractStartDate').value;
+  const endDate = document.getElementById('contractEndDate').value;
+  
+  if (!isValidContractNumber(number)) {
+    toast('Неверный формат номера договора. Используйте формат ND11-111111', 'error');
+    return;
+  }
+  
+  // Проверяем уникальность номера
+  const existingContract = state.contracts.find(c => c.number === number && c.id !== id);
+  if (existingContract) {
+    toast('Договор с таким номером уже существует', 'error');
+    return;
+  }
+  
+  const data = { number, name, clientId, startDate: new Date(startDate).toISOString(), endDate: new Date(endDate).toISOString() };
+  
+  if (id) {
+    Object.assign(getContract(id), data);
+    toast('Договор обновлён');
+  } else {
+    state.contracts.push({ id: 'cont' + Date.now(), ...data, createdAt: new Date().toISOString() });
+    toast('Договор создан');
+  }
+  
+  save();
+  closeModal('contractModal');
+  renderContracts();
+};
+
+window.deleteContract = function(id) {
+  if (!confirm('Удалить договор?')) return;
+  state.contracts = state.contracts.filter(c => c.id !== id);
+  save();
+  renderContracts();
+};
 
 function renderCompanies() { const tbody = document.getElementById('companiesTable'); if (state.companies.length === 0) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>Нет компаний</p></div></td></tr>'; return; } tbody.innerHTML = state.companies.map(c => { const clientCount = state.clients.filter(cl => cl.companyId === c.id).length; const ticketCount = state.tickets.filter(t => { const cl = getClient(t.clientId); return cl && cl.companyId === c.id; }).length; return '<tr><td><strong>' + c.name + '</strong></td><td>' + (c.domain || '—') + '</td><td>' + clientCount + '</td><td>' + ticketCount + '</td><td class="actions-cell"><button class="btn btn-small" onclick="window.openCompanyModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteCompany(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
 function openCompanyModal(id) { document.getElementById('companyForm').reset(); document.getElementById('companyId').value = ''; document.getElementById('companyModalTitle').textContent = 'Новая компания'; if (id) { const c = getCompany(id); document.getElementById('companyId').value = c.id; document.getElementById('companyName').value = c.name; document.getElementById('companyDomain').value = c.domain || ''; document.getElementById('companyModalTitle').textContent = 'Редактировать'; } openModal('companyModal'); }
@@ -1557,7 +1688,7 @@ function deleteCategory(id) { if (!confirm('Удалить?')) return; state.cat
 function resetDemoData() { if (!confirm('Сбросить все данные?')) return; Object.keys(localStorage).filter(k => k.startsWith('hd_')).forEach(k => localStorage.removeItem(k)); location.reload(); }
 
 function exportData() {
-  const data = { users: state.users, departments: state.departments, clients: state.clients, companies: state.companies, tickets: state.tickets, categories: state.categories, settings: state.settings, exportDate: new Date().toISOString(), version: '1.0' };
+  const data = { users: state.users, departments: state.departments, clients: state.clients, companies: state.companies, contracts: state.contracts, tickets: state.tickets, categories: state.categories, settings: state.settings, exportDate: new Date().toISOString(), version: '1.0' };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1580,6 +1711,7 @@ function importData(event) {
       if (data.departments) state.departments = data.departments;
       if (data.clients) state.clients = data.clients;
       if (data.companies) state.companies = data.companies;
+      if (data.contracts) state.contracts = data.contracts;
       if (data.tickets) state.tickets = data.tickets;
       if (data.categories) state.categories = data.categories;
       if (data.settings) state.settings = data.settings;
@@ -1627,6 +1759,9 @@ window.getVisibleTickets = getVisibleTickets;
 window.openClientModal = openClientModal;
 window.saveClient = saveClient;
 window.deleteClient = deleteClient;
+window.openContractModal = openContractModal;
+window.saveContract = saveContract;
+window.deleteContract = deleteContract;
 window.openCompanyModal = openCompanyModal;
 window.saveCompany = saveCompany;
 window.deleteCompany = deleteCompany;
@@ -1647,6 +1782,7 @@ window.renderTickets = renderTickets;
 window.renderDashboard = renderDashboard;
 window.renderClients = renderClients;
 window.renderCompanies = renderCompanies;
+window.renderContracts = renderContracts;
 window.renderStaff = renderStaff;
 window.renderReports = renderReports;
 window.renderDepartments = renderDepartments;
@@ -1669,6 +1805,7 @@ async function initApp() {
       state.departments = JSON.parse(localStorage.getItem('hd_departments')) || [];
       state.clients = JSON.parse(localStorage.getItem('hd_clients')) || [];
       state.companies = JSON.parse(localStorage.getItem('hd_companies')) || [];
+      state.contracts = JSON.parse(localStorage.getItem('hd_contracts')) || [];
       state.tickets = JSON.parse(localStorage.getItem('hd_tickets')) || [];
       state.categories = JSON.parse(localStorage.getItem('hd_categories')) || [];
       state.settings = JSON.parse(localStorage.getItem('hd_settings')) || { theme: 'light', companyName: 'Ярмарка CRM', autoArchiveHours: 24, soundEnabled: true, defaultAssigneeId: '' };
@@ -1685,6 +1822,7 @@ async function initApp() {
   console.log('👥 Итого пользователей:', state.users.length);
   const admin = state.users.find(u => u.role === 'admin');
   console.log('👤 Администратор:', admin ? admin.fullName + ' (пин: ' + admin.pin + ')' : 'НЕ НАЙДЕН');
+  console.log('📄 Договоров:', state.contracts.length);
 
   onSnapshot(doc(db, 'crm_data', 'main'), (doc) => {
     if (doc.exists() && !isSaving) {
@@ -1694,6 +1832,7 @@ async function initApp() {
         state.departments = newData.departments || state.departments;
         state.clients = newData.clients || state.clients;
         state.companies = newData.companies || state.companies;
+        state.contracts = newData.contracts || state.contracts || [];
         state.tickets = newData.tickets || state.tickets;
         state.categories = newData.categories || state.categories;
         state.settings = newData.settings || state.settings;
@@ -1708,6 +1847,7 @@ async function initApp() {
         if (document.getElementById('page-staff')?.classList.contains('active')) renderStaff();
         if (document.getElementById('page-users')?.classList.contains('active')) renderUsers();
         if (document.getElementById('page-departments')?.classList.contains('active')) renderDepartments();
+        if (document.getElementById('page-contracts')?.classList.contains('active')) renderContracts();
         
         updateAllCounters();
       }
@@ -1725,10 +1865,16 @@ async function initApp() {
   // Проверяем сессию заявителя
   if (state.clientSession && state.clientSession.clientId) {
     const client = getClient(state.clientSession.clientId);
-    if (client) {
-      CURRENT_CLIENT_ID = client.id;
-      showClientDashboard();
-      return;
+    const contract = getContract(state.clientSession.contractId);
+    if (client && contract) {
+      const now = new Date();
+      const endDate = new Date(contract.endDate);
+      if (now <= endDate) {
+        CURRENT_CLIENT_ID = client.id;
+        CURRENT_CONTRACT_ID = contract.id;
+        showClientDashboard();
+        return;
+      }
     }
   }
   
