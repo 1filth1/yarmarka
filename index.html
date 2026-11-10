@@ -241,7 +241,7 @@ tr:hover td { background: var(--bg); }
 .success-message p { margin-bottom: 12px; }
 .success-message .ticket-number { font-size: 20px; font-weight: 700; color: var(--primary-dark); background: white; padding: 8px 16px; border-radius: 8px; display: inline-block; margin: 10px 0; }
 .client-portal-footer { margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid var(--border); }
-.client-portal-footer a { color: var(--text-muted); font-size: 12px; text-decoration: none; }
+.client-portal-footer a { color: var(--text-muted); font-size: 12px; text-decoration: none; margin: 0 10px; }
 .client-portal-footer a:hover { color: var(--primary); }
 .client-dashboard { max-width: 1000px; margin: 0 auto; padding: 30px; }
 .client-dashboard-header { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -354,12 +354,14 @@ tr:hover td { background: var(--bg); }
       <p>Наш специалист свяжется с вами в ближайшее время.</p>
       <p style="margin-top:20px;font-size:13px"><strong>Сохраните ваши данные для входа:</strong><br>Номер договора: <span id="savedContract"></span><br>Пароль: <span id="savedPassword"></span></p>
       <button class="btn btn-primary" onclick="window.resetClientForm()" style="margin-top:20px">📝 Создать ещё одну заявку</button>
-      <button class="btn" onclick="window.showClientLogin()" style="margin-top:10px">🔐 Войти в личный кабинет</button>
+      <button class="btn btn-info" onclick="window.showClientLogin()" style="margin-top:10px">🔐 Войти в личный кабинет</button>
     </div>
   </div>
 
   <div class="client-portal-footer">
-    <a href="#" onclick="window.showStaffLogin()">🔐 Вход для сотрудников</a>
+    <a href="#" onclick="window.showClientLogin()" style="color:var(--primary);font-size:14px;font-weight:600">🔐 Вход в личный кабинет</a>
+    <span style="color:var(--border)">|</span>
+    <a href="#" onclick="window.showStaffLogin()" style="color:var(--text-muted);font-size:12px">Вход для сотрудников</a>
   </div>
 </div>
 
@@ -1463,6 +1465,7 @@ function toggleRecurrence(id) {
     if (document.getElementById('ticketViewModal').classList.contains('active')) refreshTicketModal(); 
 }
 
+// ✅ ОБНОВЛЁННАЯ ФУНКЦИЯ: добавлен выбор себя как заявителя
 function openTicketModal() { 
     document.getElementById('ticketForm').reset(); 
     document.getElementById('ticketId').value = ''; 
@@ -1475,13 +1478,35 @@ function openTicketModal() {
     document.getElementById('recurrenceEndDate').value = ''; 
     document.getElementById('recurrenceMaxCount').value = ''; 
     document.querySelectorAll('.recurrence-presets button').forEach(b => b.classList.remove('active')); 
-    document.getElementById('ticketClient').innerHTML = '<option value="">Выберите</option>' + state.clients.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); 
-    document.getElementById('ticketCategory').innerHTML = state.categories.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); 
+    
+    // ✅ ДОБАВЛЯЕМ ОПЦИЮ "Я (текущий пользователь)" В НАЧАЛО СПИСКА
     const currentUser = getCurrentUser();
+    let clientOptions = '';
+    
+    // Если пользователь вошёл в систему — добавляем его как первого заявителя
+    if (currentUser) {
+      clientOptions += '<option value="current_user" style="font-weight:bold">👤 Я (' + currentUser.fullName + ')</option>';
+      clientOptions += '<option value="">— Другие заявители —</option>';
+    } else {
+      clientOptions += '<option value="">Выберите</option>';
+    }
+    
+    // Добавляем всех клиентов из базы
+    clientOptions += state.clients.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
+    
+    document.getElementById('ticketClient').innerHTML = clientOptions;
+    document.getElementById('ticketCategory').innerHTML = state.categories.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); 
+    
+    // По умолчанию выбираем текущего пользователя
+    if (currentUser) {
+      document.getElementById('ticketClient').value = 'current_user';
+    }
+    
     document.getElementById('ticketAssignee').innerHTML = '<option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (u.id === (currentUser ? currentUser.id : '') ? 'selected' : '') + '>' + u.fullName + '</option>').join(''); 
     openModal('ticketModal'); 
 }
 
+// ✅ ОБНОВЛЁННАЯ ФУНКЦИЯ СОХРАНЕНИЯ ЗАЯВКИ
 function saveTicket(e) { 
     e.preventDefault(); 
     const id = document.getElementById('ticketId').value; 
@@ -1496,10 +1521,42 @@ function saveTicket(e) {
         const firstRunISO = new Date(firstRun).toISOString(); 
         recurrence = { enabled: true, period, interval, firstRunAt: firstRunISO, nextRunAt: firstRunISO, lastRunAt: null, endDate: endDate ? new Date(endDate).toISOString() : null, maxCount: maxCount ? parseInt(maxCount) : null, currentCount: 0 }; 
     } 
+    
+    let clientId = document.getElementById('ticketClient').value;
+    
+    // ✅ ЕСЛИ ВЫБРАН "Я" — СОЗДАЁМ ИЛИ НАХОДИМ КЛИЕНТА ПО ДАННЫМ ПОЛЬЗОВАТЕЛЯ
+    if (clientId === 'current_user') {
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        // Ищем клиента с таким же телефоном или email
+        let existingClient = state.clients.find(c => c.phone === currentUser.phone || c.email === (currentUser.email || ''));
+        
+        if (!existingClient) {
+          // Создаём нового клиента на основе данных пользователя
+          existingClient = {
+            id: 'c' + Date.now(),
+            name: currentUser.fullName,
+            email: currentUser.email || '',
+            phone: currentUser.phone,
+            password: null, // У сотрудника нет пароля для портала
+            contractId: null,
+            contractNumber: null,
+            companyId: null,
+            isStaff: true, // Пометка, что это сотрудник
+            createdAt: new Date().toISOString()
+          };
+          state.clients.push(existingClient);
+        }
+        
+        clientId = existingClient.id;
+      }
+    }
+    
     let assigneeId = document.getElementById('ticketAssignee').value; 
     if (!isAdmin() && !assigneeId) assigneeId = CURRENT_USER_ID; 
     const currentUser = getCurrentUser();
-    const data = { subject: document.getElementById('ticketSubject').value, clientId: document.getElementById('ticketClient').value, category: document.getElementById('ticketCategory').value, priority: document.getElementById('ticketPriority').value, assigneeId, description: document.getElementById('ticketDescription').value, recurrence, updatedAt: new Date().toISOString() }; 
+    const data = { subject: document.getElementById('ticketSubject').value, clientId: clientId, category: document.getElementById('ticketCategory').value, priority: document.getElementById('ticketPriority').value, assigneeId, description: document.getElementById('ticketDescription').value, recurrence, updatedAt: new Date().toISOString() }; 
+    
     if (id) { 
         const t = state.tickets.find(x => x.id === id); 
         const oldRecurrence = t.recurrence; 
@@ -1518,7 +1575,7 @@ function saveTicket(e) {
             createdAt: new Date().toISOString(), 
             resolvedAt: null, 
             recurringParentId: null, 
-            comments: [{ id: 'cm' + Date.now(), authorId: data.clientId, authorType: 'client', text: data.description, createdAt: new Date().toISOString() }], 
+            comments: [{ id: 'cm' + Date.now(), authorId: clientId, authorType: 'client', text: data.description, createdAt: new Date().toISOString() }], 
             history: [{ action: 'created', at: new Date().toISOString(), by: CURRENT_USER_ID, details: 'Заявка создана (' + (currentUser ? currentUser.fullName : 'Неизвестно') + ')' }] 
         }; 
         state.tickets.push(newT); 
@@ -1533,7 +1590,7 @@ function saveTicket(e) {
 
 function renderRecurring() { const list = document.getElementById('recurringList'); const templates = state.tickets.filter(t => t.recurrence); if (templates.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔁</div><p>Нет повторяющихся заявок</p></div>'; return; } list.innerHTML = templates.map(t => { const rec = t.recurrence; const client = getClient(t.clientId); const agent = getUser(t.assigneeId); const dep = agent ? getDepartment(agent.departmentId) : null; return '<div class="card" style="margin-bottom:12px;padding:15px;border-left:3px solid #8b5cf6"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-size:18px">🔁</span><strong style="font-size:14px;color:var(--primary-dark)">' + t.subject + '</strong><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (rec.enabled ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">АКТИВНО</span>' : '<span style="background:#e5e7eb;color:#374151;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">ПРИОСТАНОВЛЕНО</span>') + '</div><div style="font-size:11px;color:var(--text-light);display:flex;gap:12px;flex-wrap:wrap"><span>📋 ' + t.number + '</span><span>👤 ' + (client ? client.name : '—') + '</span><span>🧑‍💼 ' + (agent ? agent.fullName : 'Не назначен') + '</span>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '<span>🔁 <strong>' + formatRecurrence(rec) + '</strong></span><span>📄 Экземпляров: <strong>' + (rec.currentCount || 0) + '</strong></span></div><div style="font-size:11px;color:var(--text-light);margin-top:5px">' + (rec.lastRunAt ? 'Последнее: ' + formatDateTime(rec.lastRunAt) + ' • ' : '') + (rec.nextRunAt ? 'Следующее: <strong>' + formatDateTime(rec.nextRunAt) + '</strong>' : '') + '</div></div><div style="display:flex;gap:5px;align-items:center"><button class="btn btn-small" onclick="window.selectTicket(\'' + t.id + '\')">👁 Открыть</button><button class="btn btn-small" onclick="window.toggleRecurrence(\'' + t.id + '\')">' + (rec.enabled ? '⏸ Пауза' : '▶ Старт') + '</button></div></div></div>'; }).join(''); }
 
-function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const contract = c.contractId ? getContract(c.contractId) : null; const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + '</td><td>' + (c.email || '—') + '</td><td>' + (c.phone || '—') + '</td><td>' + (contract ? contract.number : '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
+function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const contract = c.contractId ? getContract(c.contractId) : null; const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + (c.isStaff ? ' <span style="font-size:9px;background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:8px">СОТРУДНИК</span>' : '') + '</td><td>' + (c.email || '—') + '</td><td>' + (c.phone || '—') + '</td><td>' + (contract ? contract.number : '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
 function openClientModal(id) { document.getElementById('clientForm').reset(); document.getElementById('clientId').value = ''; document.getElementById('clientModalTitle').textContent = 'Новый заявитель'; document.getElementById('clientCompany').innerHTML = '<option value="">Без компании</option>' + state.companies.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (id) { const c = getClient(id); document.getElementById('clientId').value = c.id; document.getElementById('clientName').value = c.name; document.getElementById('clientEmail').value = c.email || ''; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientCompany').value = c.companyId || ''; document.getElementById('clientModalTitle').textContent = 'Редактировать'; } openModal('clientModal'); }
 function saveClient(e) { e.preventDefault(); const id = document.getElementById('clientId').value; const data = { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, companyId: document.getElementById('clientCompany').value }; if (id) Object.assign(getClient(id), data); else state.clients.push({ id: 'c' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('clientModal'); renderClients(); updateAllCounters(); }
 function deleteClient(id) { if (!confirm('Удалить?')) return; state.clients = state.clients.filter(c => c.id !== id); save(); renderClients(); updateAllCounters(); }
@@ -1867,9 +1924,6 @@ async function initApp() {
         CURRENT_CONTRACT_ID = contract.id;
         showClientDashboard();
         return;
-      } else {
-        state.clientSession = null;
-        save();
       }
     }
   }
