@@ -246,6 +246,7 @@ tr:hover td { background: var(--bg); }
 .client-dashboard { max-width: 1000px; margin: 0 auto; padding: 30px; }
 .client-dashboard-header { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .client-dashboard-header h2 { color: var(--primary-dark); }
+.client-dashboard-actions { display: flex; gap: 10px; }
 .client-tickets-list { display: flex; flex-direction: column; gap: 12px; }
 .client-ticket-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; }
 .client-ticket-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); }
@@ -365,28 +366,69 @@ tr:hover td { background: var(--bg); }
   </div>
 </div>
 
-<!-- ВХОД В ЛИЧНЫЙ КАБИНЕТ ЗАЯВИТЕЛЯ -->
+<!-- ВХОД/РЕГИСТРАЦИЯ ЗАЯВИТЕЛЯ -->
 <div class="client-portal" id="clientLoginPortal" style="display:none">
   <div style="text-align:center;margin-bottom:30px">
     <div style="font-size:64px;margin-bottom:10px">🔐</div>
-    <h1>Вход в личный кабинет</h1>
-    <p style="color:var(--text-light);font-size:16px">Для заявителей</p>
+    <h1>Личный кабинет заявителя</h1>
+    <p style="color:var(--text-light);font-size:16px">Вход и регистрация</p>
   </div>
 
   <div class="client-form" style="max-width:500px;margin:0 auto">
-    <h2>Войти</h2>
-    <form onsubmit="window.clientLogin(event)">
-      <div class="form-group">
-        <label>Номер договора *</label>
-        <input type="text" id="clientLoginContract" required placeholder="ND11-111111" pattern="ND\d{2}-\d{6}">
-        <div class="form-hint">Формат: ND11-111111</div>
-      </div>
-      <div class="form-group">
-        <label>Пароль *</label>
-        <input type="password" id="clientLoginPassword" required placeholder="Ваш пароль">
-      </div>
-      <button type="submit" class="btn btn-primary">Войти</button>
-    </form>
+    <div class="login-tabs">
+      <div class="login-tab active" id="clientTabLogin" onclick="window.switchClientTab('login')">🔑 Вход</div>
+      <div class="login-tab" id="clientTabRegister" onclick="window.switchClientTab('register')">📝 Регистрация</div>
+    </div>
+
+    <!-- Форма входа -->
+    <div class="login-form active" id="clientLoginForm">
+      <div class="login-error" id="clientLoginError"></div>
+      <form onsubmit="window.clientLogin(event)">
+        <div class="login-field">
+          <label>Номер договора *</label>
+          <input type="text" id="clientLoginContract" required placeholder="ND11-111111" pattern="ND\d{2}-\d{6}">
+        </div>
+        <div class="login-field">
+          <label>Пароль *</label>
+          <input type="password" id="clientLoginPassword" required placeholder="Ваш пароль">
+        </div>
+        <button type="submit" class="login-btn">Войти</button>
+      </form>
+    </div>
+
+    <!-- Форма регистрации -->
+    <div class="login-form" id="clientRegisterForm">
+      <div class="login-error" id="clientRegisterError"></div>
+      <form onsubmit="window.clientRegister(event)">
+        <div class="login-field">
+          <label>Номер договора *</label>
+          <input type="text" id="clientRegContract" required placeholder="ND11-111111" pattern="ND\d{2}-\d{6}">
+          <div class="form-hint">Формат: ND + 2 цифры + дефис + 6 цифр</div>
+        </div>
+        <div class="login-field">
+          <label>Ваше имя *</label>
+          <input type="text" id="clientRegName" required placeholder="Иванов Иван">
+        </div>
+        <div class="login-field">
+          <label>Телефон *</label>
+          <input type="tel" id="clientRegPhone" required placeholder="+7 900 123-45-67">
+        </div>
+        <div class="login-field">
+          <label>Email</label>
+          <input type="email" id="clientRegEmail" placeholder="email@example.com">
+        </div>
+        <div class="login-field">
+          <label>Придумайте пароль *</label>
+          <input type="password" id="clientRegPassword" required placeholder="Минимум 4 символа" minlength="4">
+        </div>
+        <div class="login-field">
+          <label>Подтвердите пароль *</label>
+          <input type="password" id="clientRegPasswordConfirm" required placeholder="Повторите пароль" minlength="4">
+        </div>
+        <button type="submit" class="login-btn">Зарегистрироваться</button>
+      </form>
+    </div>
+
     <div style="margin-top:20px;text-align:center">
       <a href="#" onclick="window.showClientPortal()" style="color:var(--text-muted);font-size:13px">← Вернуться к созданию заявки</a>
     </div>
@@ -400,10 +442,49 @@ tr:hover td { background: var(--bg); }
       <h2>Личный кабинет</h2>
       <p style="color:var(--text-light);margin-top:5px"><span id="clientDashboardName"></span> | Договор: <span id="clientDashboardContract"></span></p>
     </div>
-    <button class="btn btn-ghost" onclick="window.clientLogout()">🚪 Выйти</button>
+    <div class="client-dashboard-actions">
+      <button class="btn btn-primary" onclick="window.showClientNewTicketForm()">📝 Новая заявка</button>
+      <button class="btn btn-ghost" onclick="window.clientLogout()">🚪 Выйти</button>
+    </div>
   </div>
 
   <div id="clientTicketsList" class="client-tickets-list"></div>
+
+  <!-- Форма создания новой заявки в личном кабинете -->
+  <div id="clientNewTicketForm" style="display:none">
+    <button class="btn btn-ghost" onclick="window.backToClientTickets()" style="margin-bottom:20px">← Назад к списку заявок</button>
+    <div class="client-form">
+      <h2>📝 Создать новую заявку</h2>
+      <form onsubmit="window.createClientTicket(event)">
+        <div class="form-group">
+          <label>Тема заявки *</label>
+          <input type="text" id="clientTicketSubject" required placeholder="Краткое описание проблемы">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Категория</label>
+            <select id="clientTicketCategory">
+              <option value="">Не выбрана</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Приоритет</label>
+            <select id="clientTicketPriority">
+              <option value="low">Низкий</option>
+              <option value="medium" selected>Средний</option>
+              <option value="high">Высокий</option>
+              <option value="urgent">Срочный</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Описание проблемы *</label>
+          <textarea id="clientTicketDescription" required placeholder="Подробно опишите вашу проблему..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">📤 Отправить заявку</button>
+      </form>
+    </div>
+  </div>
 
   <div id="clientTicketDetail" style="display:none">
     <button class="btn btn-ghost" onclick="window.backToClientTickets()" style="margin-bottom:20px">← Назад к списку заявок</button>
@@ -698,7 +779,6 @@ function updateAllCounters() {
   }
 }
 
-// ✅ ФУНКЦИЯ СКРЫТИЯ ВСЕХ ИНТЕРФЕЙСОВ
 function hideAllInterfaces() {
   document.getElementById('clientPortal').style.display = 'none';
   document.getElementById('clientLoginPortal').style.display = 'none';
@@ -708,7 +788,6 @@ function hideAllInterfaces() {
   document.getElementById('appMain').style.display = 'none';
 }
 
-// ✅ ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ИНТЕРФЕЙСОВ
 function showClientPortal() {
   hideAllInterfaces();
   document.getElementById('clientPortal').style.display = 'block';
@@ -717,6 +796,8 @@ function showClientPortal() {
 function showClientLogin() {
   hideAllInterfaces();
   document.getElementById('clientLoginPortal').style.display = 'block';
+  // Сброс вкладок на вход
+  window.switchClientTab('login');
 }
 
 function showClientDashboard() {
@@ -752,6 +833,123 @@ function showApp() {
 
 window.showStaffLogin = function() {
   showLogin();
+};
+
+// ✅ ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ВХОД/РЕГИСТРАЦИЯ ДЛЯ ЗАЯВИТЕЛЕЙ
+window.switchClientTab = function(tab) {
+  document.getElementById('clientTabLogin').classList.remove('active');
+  document.getElementById('clientTabRegister').classList.remove('active');
+  document.getElementById('clientLoginForm').classList.remove('active');
+  document.getElementById('clientRegisterForm').classList.remove('active');
+  
+  // Сброс ошибок
+  document.getElementById('clientLoginError').classList.remove('show');
+  document.getElementById('clientRegisterError').classList.remove('show');
+  
+  if (tab === 'login') {
+    document.getElementById('clientTabLogin').classList.add('active');
+    document.getElementById('clientLoginForm').classList.add('active');
+  } else {
+    document.getElementById('clientTabRegister').classList.add('active');
+    document.getElementById('clientRegisterForm').classList.add('active');
+  }
+};
+
+function showClientLoginError(id, msg) { 
+  const el = document.getElementById(id); 
+  el.textContent = msg; 
+  el.classList.add('show'); 
+}
+
+function hideClientLoginError(id) { 
+  document.getElementById(id).classList.remove('show'); 
+}
+
+// ✅ РЕГИСТРАЦИЯ ЗАЯВИТЕЛЯ
+window.clientRegister = function(e) {
+  e.preventDefault();
+  hideClientLoginError('clientRegisterError');
+  
+  const contractNumber = document.getElementById('clientRegContract').value.trim().toUpperCase();
+  const name = document.getElementById('clientRegName').value.trim();
+  const phone = document.getElementById('clientRegPhone').value.trim();
+  const email = document.getElementById('clientRegEmail').value.trim();
+  const password = document.getElementById('clientRegPassword').value;
+  const passwordConfirm = document.getElementById('clientRegPasswordConfirm').value;
+  
+  if (!isValidContractNumber(contractNumber)) {
+    showClientLoginError('clientRegisterError', 'Неверный формат номера договора');
+    return;
+  }
+  
+  const contract = state.contracts.find(c => c.number === contractNumber);
+  if (!contract) {
+    showClientLoginError('clientRegisterError', 'Договор не найден в базе. Обратитесь к администратору.');
+    return;
+  }
+  
+  const now = new Date();
+  const endDate = new Date(contract.endDate);
+  if (now > endDate) {
+    showClientLoginError('clientRegisterError', 'Срок действия договора истёк');
+    return;
+  }
+  
+  if (!name || name.split(' ').length < 2) {
+    showClientLoginError('clientRegisterError', 'Введите ФИО полностью');
+    return;
+  }
+  
+  if (!phone || phone.length < 5) {
+    showClientLoginError('clientRegisterError', 'Введите корректный телефон');
+    return;
+  }
+  
+  if (password.length < 4) {
+    showClientLoginError('clientRegisterError', 'Пароль должен содержать минимум 4 символа');
+    return;
+  }
+  
+  if (password !== passwordConfirm) {
+    showClientLoginError('clientRegisterError', 'Пароли не совпадают');
+    return;
+  }
+  
+  // Проверяем, есть ли уже заявитель по этому договору
+  let client = state.clients.find(c => c.contractId === contract.id);
+  
+  if (client) {
+    // Заявитель уже существует — обновляем пароль
+    client.password = password;
+    if (name) client.name = name;
+    if (phone) client.phone = phone;
+    if (email) client.email = email;
+    toast('✅ Пароль обновлён! Теперь вы можете войти.');
+  } else {
+    // Создаём нового заявителя
+    client = {
+      id: 'c' + Date.now(),
+      name: name,
+      email: email,
+      phone: phone,
+      password: password,
+      contractId: contract.id,
+      contractNumber: contractNumber,
+      companyId: null,
+      createdAt: new Date().toISOString()
+    };
+    state.clients.push(client);
+    toast('✅ Регистрация успешна!');
+  }
+  
+  // Автоматический вход
+  CURRENT_CLIENT_ID = client.id;
+  CURRENT_CONTRACT_ID = contract.id;
+  state.clientSession = { clientId: client.id, contractId: contract.id, loginAt: new Date().toISOString() };
+  save();
+  
+  toast('👋 Добро пожаловать, ' + client.name + '!');
+  showClientDashboard();
 };
 
 // ✅ ФУНКЦИИ ДЛЯ ЗАЯВИТЕЛЕЙ
@@ -893,38 +1091,39 @@ window.showClientPortal = function() {
 
 window.clientLogin = function(e) {
   e.preventDefault();
+  hideClientLoginError('clientLoginError');
   
   const contractNumber = document.getElementById('clientLoginContract').value.trim().toUpperCase();
   const password = document.getElementById('clientLoginPassword').value;
   
   if (!isValidContractNumber(contractNumber)) {
-    toast('Неверный формат номера договора', 'error');
+    showClientLoginError('clientLoginError', 'Неверный формат номера договора');
     return;
   }
   
   const contract = state.contracts.find(c => c.number === contractNumber);
   
   if (!contract) {
-    toast('Договор не найден в базе', 'error');
+    showClientLoginError('clientLoginError', 'Договор не найден в базе');
     return;
   }
   
   const now = new Date();
   const endDate = new Date(contract.endDate);
   if (now > endDate) {
-    toast('Срок действия договора истёк', 'error');
+    showClientLoginError('clientLoginError', 'Срок действия договора истёк');
     return;
   }
   
   const client = state.clients.find(c => c.contractId === contract.id);
   
   if (!client) {
-    toast('Заявитель не найден. Создайте первую заявку.', 'error');
+    showClientLoginError('clientLoginError', 'Заявитель не найден. Сначала зарегистрируйтесь.');
     return;
   }
   
   if (client.password !== password) {
-    toast('Неверный пароль', 'error');
+    showClientLoginError('clientLoginError', 'Неверный пароль');
     return;
   }
   
@@ -937,6 +1136,88 @@ window.clientLogin = function(e) {
   showClientDashboard();
 };
 
+// ✅ СОЗДАНИЕ ЗАЯВКИ В ЛИЧНОМ КАБИНЕТЕ
+window.showClientNewTicketForm = function() {
+  document.getElementById('clientTicketsList').style.display = 'none';
+  document.getElementById('clientTicketDetail').style.display = 'none';
+  document.getElementById('clientNewTicketForm').style.display = 'block';
+  
+  // Заполняем категории
+  const categorySelect = document.getElementById('clientTicketCategory');
+  if (categorySelect) {
+    categorySelect.innerHTML = '<option value="">Не выбрана</option>' + state.categories.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
+  }
+};
+
+window.createClientTicket = function(e) {
+  e.preventDefault();
+  
+  const client = getCurrentClient();
+  const contract = getCurrentContract();
+  
+  if (!client || !contract) {
+    toast('Ошибка сессии. Войдите заново.', 'error');
+    return;
+  }
+  
+  const subject = document.getElementById('clientTicketSubject').value.trim();
+  const category = document.getElementById('clientTicketCategory').value;
+  const priority = document.getElementById('clientTicketPriority').value;
+  const description = document.getElementById('clientTicketDescription').value.trim();
+  
+  if (!subject || !description) {
+    toast('Заполните обязательные поля', 'error');
+    return;
+  }
+  
+  const defaultAssigneeId = state.settings.defaultAssigneeId || '';
+  
+  const maxNum = state.tickets.reduce((m, t) => Math.max(m, parseInt(t.number.replace('HD-', ''))), 1000);
+  const newTicket = {
+    id: 't' + Date.now(),
+    number: 'HD-' + (maxNum + 1),
+    subject: subject,
+    description: description,
+    clientId: client.id,
+    contractId: contract.id,
+    contractNumber: contract.number,
+    category: category,
+    priority: priority,
+    status: 'new',
+    assigneeId: defaultAssigneeId || null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    resolvedAt: null,
+    recurrence: null,
+    recurringParentId: null,
+    comments: [{
+      id: 'cm' + Date.now(),
+      authorId: client.id,
+      authorType: 'client',
+      text: description,
+      createdAt: new Date().toISOString()
+    }],
+    history: [{
+      action: 'created',
+      at: new Date().toISOString(),
+      by: 'client',
+      details: 'Заявка создана из личного кабинета'
+    }]
+  };
+  
+  state.tickets.push(newTicket);
+  save();
+  
+  // Очищаем форму
+  document.getElementById('clientTicketSubject').value = '';
+  document.getElementById('clientTicketDescription').value = '';
+  document.getElementById('clientTicketCategory').value = '';
+  document.getElementById('clientTicketPriority').value = 'medium';
+  
+  toast('✅ Заявка ' + newTicket.number + ' создана!');
+  window.backToClientTickets();
+};
+
 function renderClientTickets() {
   const client = getCurrentClient();
   if (!client) return;
@@ -945,7 +1226,7 @@ function renderClientTickets() {
   const list = document.getElementById('clientTicketsList');
   
   if (clientTickets.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>У вас пока нет заявок</p></div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>У вас пока нет заявок</p><button class="btn btn-primary" onclick="window.showClientNewTicketForm()" style="margin-top:20px">📝 Создать первую заявку</button></div>';
     return;
   }
   
@@ -967,6 +1248,7 @@ function renderClientTickets() {
   
   document.getElementById('clientTicketsList').style.display = 'flex';
   document.getElementById('clientTicketDetail').style.display = 'none';
+  document.getElementById('clientNewTicketForm').style.display = 'none';
 }
 
 window.openClientTicket = function(ticketId) {
@@ -1025,6 +1307,7 @@ function renderClientTicketDetail(t) {
   
   document.getElementById('clientTicketContent').innerHTML = html;
   document.getElementById('clientTicketsList').style.display = 'none';
+  document.getElementById('clientNewTicketForm').style.display = 'none';
   document.getElementById('clientTicketDetail').style.display = 'block';
 }
 
@@ -1054,7 +1337,9 @@ window.sendClientReply = function(ticketId) {
 window.backToClientTickets = function() {
   document.getElementById('clientTicketsList').style.display = 'flex';
   document.getElementById('clientTicketDetail').style.display = 'none';
+  document.getElementById('clientNewTicketForm').style.display = 'none';
   selectedTicketId = null;
+  renderClientTickets();
 };
 
 window.clientLogout = function() {
@@ -1465,7 +1750,6 @@ function toggleRecurrence(id) {
     if (document.getElementById('ticketViewModal').classList.contains('active')) refreshTicketModal(); 
 }
 
-// ✅ ОБНОВЛЁННАЯ ФУНКЦИЯ: добавлен выбор себя как заявителя
 function openTicketModal() { 
     document.getElementById('ticketForm').reset(); 
     document.getElementById('ticketId').value = ''; 
@@ -1479,11 +1763,9 @@ function openTicketModal() {
     document.getElementById('recurrenceMaxCount').value = ''; 
     document.querySelectorAll('.recurrence-presets button').forEach(b => b.classList.remove('active')); 
     
-    // ✅ ДОБАВЛЯЕМ ОПЦИЮ "Я (текущий пользователь)" В НАЧАЛО СПИСКА
     const currentUser = getCurrentUser();
     let clientOptions = '';
     
-    // Если пользователь вошёл в систему — добавляем его как первого заявителя
     if (currentUser) {
       clientOptions += '<option value="current_user" style="font-weight:bold">👤 Я (' + currentUser.fullName + ')</option>';
       clientOptions += '<option value="">— Другие заявители —</option>';
@@ -1491,13 +1773,11 @@ function openTicketModal() {
       clientOptions += '<option value="">Выберите</option>';
     }
     
-    // Добавляем всех клиентов из базы
     clientOptions += state.clients.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
     
     document.getElementById('ticketClient').innerHTML = clientOptions;
     document.getElementById('ticketCategory').innerHTML = state.categories.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); 
     
-    // По умолчанию выбираем текущего пользователя
     if (currentUser) {
       document.getElementById('ticketClient').value = 'current_user';
     }
@@ -1506,7 +1786,6 @@ function openTicketModal() {
     openModal('ticketModal'); 
 }
 
-// ✅ ОБНОВЛЁННАЯ ФУНКЦИЯ СОХРАНЕНИЯ ЗАЯВКИ
 function saveTicket(e) { 
     e.preventDefault(); 
     const id = document.getElementById('ticketId').value; 
@@ -1524,25 +1803,22 @@ function saveTicket(e) {
     
     let clientId = document.getElementById('ticketClient').value;
     
-    // ✅ ЕСЛИ ВЫБРАН "Я" — СОЗДАЁМ ИЛИ НАХОДИМ КЛИЕНТА ПО ДАННЫМ ПОЛЬЗОВАТЕЛЯ
     if (clientId === 'current_user') {
       const currentUser = getCurrentUser();
       if (currentUser) {
-        // Ищем клиента с таким же телефоном или email
         let existingClient = state.clients.find(c => c.phone === currentUser.phone || c.email === (currentUser.email || ''));
         
         if (!existingClient) {
-          // Создаём нового клиента на основе данных пользователя
           existingClient = {
             id: 'c' + Date.now(),
             name: currentUser.fullName,
             email: currentUser.email || '',
             phone: currentUser.phone,
-            password: null, // У сотрудника нет пароля для портала
+            password: null,
             contractId: null,
             contractNumber: null,
             companyId: null,
-            isStaff: true, // Пометка, что это сотрудник
+            isStaff: true,
             createdAt: new Date().toISOString()
           };
           state.clients.push(existingClient);
@@ -1852,7 +2128,6 @@ async function initApp() {
   if (!loaded || state.users.length === 0) {
     const localUsers = JSON.parse(localStorage.getItem('hd_users')) || [];
     if (localUsers.length > 0) {
-      console.log('📦 Загружаем из localStorage:', localUsers.length, 'пользователей');
       state.users = localUsers;
       state.departments = JSON.parse(localStorage.getItem('hd_departments')) || [];
       state.clients = JSON.parse(localStorage.getItem('hd_clients')) || [];
@@ -1866,15 +2141,12 @@ async function initApp() {
   }
   
   if (state.users.length === 0) {
-    console.log('🆕 Создаём демо-данные с администратором (пин 1408)...');
     seedData();
     await saveToFirebase();
   }
   
   console.log('👥 Итого пользователей:', state.users.length);
   console.log('📄 Договоров:', state.contracts.length);
-  const admin = state.users.find(u => u.role === 'admin');
-  console.log('👤 Администратор:', admin ? admin.fullName + ' (пин: ' + admin.pin + ')' : 'НЕ НАЙДЕН');
 
   onSnapshot(doc(db, 'crm_data', 'main'), (doc) => {
     if (doc.exists() && !isSaving) {
