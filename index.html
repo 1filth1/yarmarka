@@ -8,7 +8,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root { --primary: #10b981; --primary-hover: #059669; --primary-light: #d1fae5; --primary-dark: #047857; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --bg: #f0fdf4; --card: #ffffff; --text: #1f2937; --text-light: #6b7280; --text-muted: #9ca3af; --border: #d1fae5; --sidebar: #064e3b; --sidebar-hover: #065f46; }
 [data-theme="dark"] { --bg: #022c22; --card: #064e3b; --text: #ecfdf5; --text-light: #a7f3d0; --text-muted: #6ee7b7; --border: #065f46; --sidebar: #022c22; --sidebar-hover: #064e3b; --primary-light: #065f46; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
 .login-screen { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #10b981 100%); display: flex; align-items: center; justify-content: center; padding: 20px; }
 .login-container { position: relative; background: white; border-radius: 16px; width: 100%; max-width: 440px; padding: 35px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
 [data-theme="dark"] .login-container { background: #064e3b; }
@@ -226,7 +226,7 @@ tr:hover td { background: var(--bg); }
 @media (max-width: 700px) { .status-cards { grid-template-columns: repeat(2, 1fr); } }
 
 .client-portal { max-width: 900px; margin: 0 auto; padding: 30px; }
-.client-portal h1 { font-size: 28px; margin-bottom: 10px; color: var(--primary-dark); }
+.client-portal h1 { font-size: 28px; margin-bottom: 10px; color: var(--primary-dark); text-align: center; }
 .client-portal .intro { background: var(--card); padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
 .client-portal .intro p { margin-bottom: 10px; color: var(--text-light); line-height: 1.6; }
 .client-portal .intro .contract-info { background: #fef3c7; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #f59e0b; }
@@ -304,7 +304,7 @@ tr:hover td { background: var(--bg); }
         <div class="form-group">
           <label>Номер договора *</label>
           <input type="text" id="publicContractNumber" required placeholder="ND11-111111" pattern="ND\d{2}-\d{6}">
-          <div class="form-hint">Формат: ND11-111111 (ND + 2 цифры + дефис + 6 цифр)</div>
+          <div class="form-hint">Формат: ND + 2 цифры + дефис + 6 цифр (например: ND11-111111)</div>
         </div>
 
         <div class="form-group" id="passwordField" style="display:none">
@@ -409,7 +409,7 @@ tr:hover td { background: var(--bg); }
   </div>
 </div>
 
-<!-- ОСТАЛЬНОЙ КОД CRM (сотрудники) -->
+<!-- ВХОД СОТРУДНИКОВ -->
 <div class="login-screen" id="loginScreen" style="display:none">
   <div class="login-container">
     <div class="login-logo">🎪</div>
@@ -563,7 +563,6 @@ async function saveToFirebase() {
       companies: state.companies, contracts: state.contracts, tickets: state.tickets, categories: state.categories,
       settings: state.settings, updatedAt: new Date().toISOString()
     });
-    console.log('✅ Сохранено в Firebase');
   } catch (e) { console.error("❌ Firebase error:", e); }
   finally { isSaving = false; }
 }
@@ -582,7 +581,6 @@ async function loadFromFirebase() {
         state.tickets = d.tickets || state.tickets;
         state.categories = d.categories || state.categories;
         state.settings = d.settings || state.settings;
-        console.log('✅ Загружено из Firebase:', state.users.length, 'пользователей');
         return true;
       }
     }
@@ -591,7 +589,6 @@ async function loadFromFirebase() {
 }
 
 function seedData() {
-  console.log('🌱 Создаём демо-данные...');
   state.departments = [{ id: 'dep1', name: 'Техническая поддержка', description: 'Решение технических вопросов', color: '#10b981', createdAt: new Date().toISOString() }, { id: 'dep2', name: 'Отдел продаж', description: 'Работа с клиентами', color: '#3b82f6', createdAt: new Date().toISOString() }];
   state.users = [{ id: 'user-admin', fullName: 'Администратор Системы', phone: '+79000000000', pin: '1408', role: 'admin', departmentId: 'dep1', createdAt: new Date().toISOString() }, { id: 'user-2', fullName: 'Петров Сергей', phone: '+79001111111', pin: '1111', role: 'staff', departmentId: 'dep1', createdAt: new Date().toISOString() }];
   state.categories = [{ id: 'cat1', name: 'Тех. поддержка', color: '#10b981' }, { id: 'cat2', name: 'Продажи', color: '#059669' }, { id: 'cat3', name: 'Оплата', color: '#f59e0b' }];
@@ -699,14 +696,68 @@ function updateAllCounters() {
   }
 }
 
+// ✅ ФУНКЦИЯ СКРЫТИЯ ВСЕХ ИНТЕРФЕЙСОВ
+function hideAllInterfaces() {
+  document.getElementById('clientPortal').style.display = 'none';
+  document.getElementById('clientLoginPortal').style.display = 'none';
+  document.getElementById('clientDashboard').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appSidebar').style.display = 'none';
+  document.getElementById('appMain').style.display = 'none';
+}
+
+// ✅ ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ИНТЕРФЕЙСОВ
+function showClientPortal() {
+  hideAllInterfaces();
+  document.getElementById('clientPortal').style.display = 'block';
+}
+
+function showClientLogin() {
+  hideAllInterfaces();
+  document.getElementById('clientLoginPortal').style.display = 'block';
+}
+
+function showClientDashboard() {
+  hideAllInterfaces();
+  document.getElementById('clientDashboard').style.display = 'block';
+  
+  const client = getCurrentClient();
+  const contract = getCurrentContract();
+  if (client) {
+    document.getElementById('clientDashboardName').textContent = client.name;
+    document.getElementById('clientDashboardContract').textContent = contract ? contract.number : 'Не указан';
+  }
+  
+  renderClientTickets();
+}
+
+function showLogin() { 
+  hideAllInterfaces();
+  document.getElementById('loginScreen').style.display = 'flex'; 
+  renderUserPicker(); 
+  renderRegDepartments(); 
+}
+
+function showApp() { 
+  hideAllInterfaces();
+  document.getElementById('appSidebar').style.display = ''; 
+  document.getElementById('appMain').style.display = ''; 
+  applyPermissions(); 
+  renderCurrentUser(); 
+  renderTickets(); 
+  updateAllCounters(); 
+}
+
+window.showStaffLogin = function() {
+  showLogin();
+};
+
 // ✅ ФУНКЦИИ ДЛЯ ЗАЯВИТЕЛЕЙ
 
-// Проверка формата номера договора
 function isValidContractNumber(number) {
   return /^ND\d{2}-\d{6}$/.test(number);
 }
 
-// Создание заявки заявителем
 window.createPublicTicket = async function(e) {
   e.preventDefault();
   
@@ -730,7 +781,6 @@ window.createPublicTicket = async function(e) {
     return;
   }
   
-  // Ищем договор
   const contract = state.contracts.find(c => c.number === contractNumber);
   
   if (!contract) {
@@ -738,7 +788,6 @@ window.createPublicTicket = async function(e) {
     return;
   }
   
-  // Проверяем срок действия договора
   const now = new Date();
   const endDate = new Date(contract.endDate);
   if (now > endDate) {
@@ -746,12 +795,10 @@ window.createPublicTicket = async function(e) {
     return;
   }
   
-  // Ищем заявителя по договору
   let client = state.clients.find(c => c.contractId === contract.id);
   let isNewClient = false;
   
   if (!client) {
-    // Новый заявитель - требуем пароль
     if (!password || password.length < 4) {
       toast('Придумайте пароль (минимум 4 символа)', 'error');
       return;
@@ -771,21 +818,17 @@ window.createPublicTicket = async function(e) {
     };
     state.clients.push(client);
   } else {
-    // Существующий заявитель - проверяем пароль
     if (client.password !== password) {
       toast('Неверный пароль. Используйте пароль, который вы указали при первой заявке.', 'error');
       return;
     }
-    // Обновляем данные если изменились
     if (name) client.name = name;
     if (email) client.email = email;
     if (phone) client.phone = phone;
   }
   
-  // Получаем ответственного из настроек
   const defaultAssigneeId = state.settings.defaultAssigneeId || '';
   
-  // Создаём заявку
   const maxNum = state.tickets.reduce((m, t) => Math.max(m, parseInt(t.number.replace('HD-', ''))), 1000);
   const newTicket = {
     id: 't' + Date.now(),
@@ -822,7 +865,6 @@ window.createPublicTicket = async function(e) {
   state.tickets.push(newTicket);
   save();
   
-  // Показываем успешное сообщение
   document.getElementById('clientFormSection').style.display = 'none';
   document.getElementById('clientSuccessSection').style.display = 'block';
   document.getElementById('createdTicketNumber').textContent = newTicket.number;
@@ -840,16 +882,13 @@ window.resetClientForm = function() {
 };
 
 window.showClientLogin = function() {
-  document.getElementById('clientPortal').style.display = 'none';
-  document.getElementById('clientLoginPortal').style.display = 'block';
+  showClientLogin();
 };
 
 window.showClientPortal = function() {
-  document.getElementById('clientLoginPortal').style.display = 'none';
-  document.getElementById('clientPortal').style.display = 'block';
+  showClientPortal();
 };
 
-// Вход в личный кабинет заявителя
 window.clientLogin = function(e) {
   e.preventDefault();
   
@@ -861,7 +900,6 @@ window.clientLogin = function(e) {
     return;
   }
   
-  // Ищем договор
   const contract = state.contracts.find(c => c.number === contractNumber);
   
   if (!contract) {
@@ -869,7 +907,6 @@ window.clientLogin = function(e) {
     return;
   }
   
-  // Проверяем срок действия
   const now = new Date();
   const endDate = new Date(contract.endDate);
   if (now > endDate) {
@@ -877,7 +914,6 @@ window.clientLogin = function(e) {
     return;
   }
   
-  // Ищем заявителя по договору
   const client = state.clients.find(c => c.contractId === contract.id);
   
   if (!client) {
@@ -899,23 +935,6 @@ window.clientLogin = function(e) {
   showClientDashboard();
 };
 
-// Показать личный кабинет заявителя
-function showClientDashboard() {
-  document.getElementById('clientPortal').style.display = 'none';
-  document.getElementById('clientLoginPortal').style.display = 'none';
-  document.getElementById('clientDashboard').style.display = 'block';
-  
-  const client = getCurrentClient();
-  const contract = getCurrentContract();
-  if (client) {
-    document.getElementById('clientDashboardName').textContent = client.name;
-    document.getElementById('clientDashboardContract').textContent = contract ? contract.number : 'Не указан';
-  }
-  
-  renderClientTickets();
-}
-
-// Список заявок заявителя
 function renderClientTickets() {
   const client = getCurrentClient();
   if (!client) return;
@@ -948,7 +967,6 @@ function renderClientTickets() {
   document.getElementById('clientTicketDetail').style.display = 'none';
 }
 
-// Открыть заявку заявителя
 window.openClientTicket = function(ticketId) {
   const t = state.tickets.find(x => x.id === ticketId);
   if (!t) return;
@@ -963,7 +981,6 @@ window.openClientTicket = function(ticketId) {
   renderClientTicketDetail(t);
 };
 
-// Детали заявки для заявителя
 function renderClientTicketDetail(t) {
   const assignee = getUser(t.assigneeId);
   const isResolved = t.status === 'solved' || t.status === 'closed';
@@ -980,7 +997,6 @@ function renderClientTicketDetail(t) {
   }
   html += '</div>';
   
-  // Чат
   html += '<div class="client-chat">';
   html += '<div class="client-chat-header">💬 Переписка (' + t.comments.length + ')</div>';
   html += '<div class="client-chat-messages" id="clientChatMessages">';
@@ -1010,7 +1026,6 @@ function renderClientTicketDetail(t) {
   document.getElementById('clientTicketDetail').style.display = 'block';
 }
 
-// Отправить сообщение от заявителя
 window.sendClientReply = function(ticketId) {
   const text = document.getElementById('clientReplyText').value.trim();
   if (!text) { toast('Введите текст', 'error'); return; }
@@ -1046,11 +1061,9 @@ window.clientLogout = function() {
   CURRENT_CONTRACT_ID = null;
   state.clientSession = null;
   save();
-  document.getElementById('clientDashboard').style.display = 'none';
-  document.getElementById('clientPortal').style.display = 'block';
+  showClientPortal();
 };
 
-// Показывать поле пароля только для новых заявителей
 document.addEventListener('input', function(e) {
   if (e.target.id === 'publicContractNumber') {
     const contractNumber = e.target.value.trim().toUpperCase();
@@ -1074,24 +1087,18 @@ document.addEventListener('input', function(e) {
   }
 });
 
-// Остальные функции CRM...
 function checkAuth() {
-  console.log('🔐 Проверка авторизации...');
   if (state.session && state.session.userId) {
     const user = getUser(state.session.userId);
     if (user) {
       CURRENT_USER_ID = user.id;
-      console.log('✅ Автовход под:', user.fullName);
       showApp();
       return;
     }
   }
-  console.log('👋 Показываем экран входа');
   showLogin();
 }
 
-function showLogin() { document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('appSidebar').style.display = 'none'; document.getElementById('appMain').style.display = 'none'; renderUserPicker(); renderRegDepartments(); }
-function showApp() { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('appSidebar').style.display = ''; document.getElementById('appMain').style.display = ''; applyPermissions(); renderCurrentUser(); renderTickets(); updateAllCounters(); }
 function applyPermissions() { const admin = isAdmin(); document.querySelectorAll('.admin-only').forEach(el => { el.style.display = admin ? '' : 'none'; }); }
 function renderCurrentUser() { const u = getCurrentUser(); if (!u) return; const dep = getDepartment(u.departmentId); document.getElementById('currentUserName').textContent = u.fullName; document.getElementById('currentUserRole').textContent = (dep ? dep.name + ' • ' : '') + ROLE_LABELS[u.role]; document.getElementById('currentUserAvatar').textContent = getInitials(u.fullName); }
 
@@ -1153,15 +1160,6 @@ document.addEventListener('input', e => { if (e.target.classList && e.target.cla
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') { if (document.getElementById('loginForm').classList.contains('active')) doLogin(); else if (document.getElementById('registerForm').classList.contains('active')) doRegister(); } if (e.key === 'Escape' && document.getElementById('ticketViewModal')?.classList.contains('active')) { closeTicketModal(); } });
 
 document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active'); const page = item.dataset.page; document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-' + page).classList.add('active'); if (page === 'dashboard') renderDashboard(); if (page === 'clients') renderClients(); if (page === 'companies') renderCompanies(); if (page === 'contracts') renderContracts(); if (page === 'staff') renderStaff(); if (page === 'reports') renderReports(); if (page === 'tickets') renderTickets(); if (page === 'recurring') renderRecurring(); if (page === 'departments') renderDepartments(); if (page === 'users') renderUsers(); if (page === 'settings') renderSettings(); }); });
-
-window.showStaffLogin = function() {
-  document.getElementById('clientPortal').style.display = 'none';
-  document.getElementById('clientLoginPortal').style.display = 'none';
-  document.getElementById('clientDashboard').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  renderUserPicker();
-  renderRegDepartments();
-};
 
 function openPostponeModal(id) {
     const t = state.tickets.find(x => x.id === id);
@@ -1533,18 +1531,17 @@ function saveTicket(e) {
     updateAllCounters();
 }
 
-function renderRecurring() { const list = document.getElementById('recurringList'); const templates = state.tickets.filter(t => t.recurrence); if (templates.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔁</div><p>Нет повторяющихся заявок</p></div>'; return; } list.innerHTML = templates.map(t => { const rec = t.recurrence; const client = getClient(t.clientId); const agent = getUser(t.assigneeId); const dep = agent ? getDepartment(agent.departmentId) : null; const instances = state.tickets.filter(x => x.recurringParentId === t.id).length; return '<div class="card" style="margin-bottom:12px;padding:15px;border-left:3px solid #8b5cf6"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-size:18px">🔁</span><strong style="font-size:14px;color:var(--primary-dark)">' + t.subject + '</strong><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (rec.enabled ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">АКТИВНО</span>' : '<span style="background:#e5e7eb;color:#374151;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">ПРИОСТАНОВЛЕНО</span>') + '</div><div style="font-size:11px;color:var(--text-light);display:flex;gap:12px;flex-wrap:wrap"><span>📋 ' + t.number + '</span><span>👤 ' + (client ? client.name : '—') + '</span><span>🧑‍💼 ' + (agent ? agent.fullName : 'Не назначен') + '</span>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '<span>🔁 <strong>' + formatRecurrence(rec) + '</strong></span><span>📄 Экземпляров: <strong>' + (rec.currentCount || 0) + '</strong></span></div><div style="font-size:11px;color:var(--text-light);margin-top:5px">' + (rec.lastRunAt ? 'Последнее: ' + formatDateTime(rec.lastRunAt) + ' • ' : '') + (rec.nextRunAt ? 'Следующее: <strong>' + formatDateTime(rec.nextRunAt) + '</strong>' : '') + '</div></div><div style="display:flex;gap:5px;align-items:center"><button class="btn btn-small" onclick="window.selectTicket(\'' + t.id + '\')">👁 Открыть</button><button class="btn btn-small" onclick="window.toggleRecurrence(\'' + t.id + '\')">' + (rec.enabled ? '⏸ Пауза' : '▶ Старт') + '</button></div></div></div>'; }).join(''); }
+function renderRecurring() { const list = document.getElementById('recurringList'); const templates = state.tickets.filter(t => t.recurrence); if (templates.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔁</div><p>Нет повторяющихся заявок</p></div>'; return; } list.innerHTML = templates.map(t => { const rec = t.recurrence; const client = getClient(t.clientId); const agent = getUser(t.assigneeId); const dep = agent ? getDepartment(agent.departmentId) : null; return '<div class="card" style="margin-bottom:12px;padding:15px;border-left:3px solid #8b5cf6"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-size:18px">🔁</span><strong style="font-size:14px;color:var(--primary-dark)">' + t.subject + '</strong><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (rec.enabled ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">АКТИВНО</span>' : '<span style="background:#e5e7eb;color:#374151;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">ПРИОСТАНОВЛЕНО</span>') + '</div><div style="font-size:11px;color:var(--text-light);display:flex;gap:12px;flex-wrap:wrap"><span>📋 ' + t.number + '</span><span>👤 ' + (client ? client.name : '—') + '</span><span>🧑‍💼 ' + (agent ? agent.fullName : 'Не назначен') + '</span>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '<span>🔁 <strong>' + formatRecurrence(rec) + '</strong></span><span>📄 Экземпляров: <strong>' + (rec.currentCount || 0) + '</strong></span></div><div style="font-size:11px;color:var(--text-light);margin-top:5px">' + (rec.lastRunAt ? 'Последнее: ' + formatDateTime(rec.lastRunAt) + ' • ' : '') + (rec.nextRunAt ? 'Следующее: <strong>' + formatDateTime(rec.nextRunAt) + '</strong>' : '') + '</div></div><div style="display:flex;gap:5px;align-items:center"><button class="btn btn-small" onclick="window.selectTicket(\'' + t.id + '\')">👁 Открыть</button><button class="btn btn-small" onclick="window.toggleRecurrence(\'' + t.id + '\')">' + (rec.enabled ? '⏸ Пауза' : '▶ Старт') + '</button></div></div></div>'; }).join(''); }
 
-function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const contract = c.contractId ? getContract(c.contractId) : null; const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; const company = c.companyId ? getCompany(c.companyId) : null; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + '</td><td>' + c.email + '</td><td>' + (c.phone || '—') + '</td><td>' + (contract ? contract.number : '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
-function openClientModal(id) { document.getElementById('clientForm').reset(); document.getElementById('clientId').value = ''; document.getElementById('clientModalTitle').textContent = 'Новый заявитель'; document.getElementById('clientCompany').innerHTML = '<option value="">Без компании</option>' + state.companies.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (id) { const c = getClient(id); document.getElementById('clientId').value = c.id; document.getElementById('clientName').value = c.name; document.getElementById('clientEmail').value = c.email; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientCompany').value = c.companyId || ''; document.getElementById('clientModalTitle').textContent = 'Редактировать'; } openModal('clientModal'); }
+function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const contract = c.contractId ? getContract(c.contractId) : null; const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + '</td><td>' + (c.email || '—') + '</td><td>' + (c.phone || '—') + '</td><td>' + (contract ? contract.number : '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
+function openClientModal(id) { document.getElementById('clientForm').reset(); document.getElementById('clientId').value = ''; document.getElementById('clientModalTitle').textContent = 'Новый заявитель'; document.getElementById('clientCompany').innerHTML = '<option value="">Без компании</option>' + state.companies.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (id) { const c = getClient(id); document.getElementById('clientId').value = c.id; document.getElementById('clientName').value = c.name; document.getElementById('clientEmail').value = c.email || ''; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientCompany').value = c.companyId || ''; document.getElementById('clientModalTitle').textContent = 'Редактировать'; } openModal('clientModal'); }
 function saveClient(e) { e.preventDefault(); const id = document.getElementById('clientId').value; const data = { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, companyId: document.getElementById('clientCompany').value }; if (id) Object.assign(getClient(id), data); else state.clients.push({ id: 'c' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('clientModal'); renderClients(); updateAllCounters(); }
 function deleteClient(id) { if (!confirm('Удалить?')) return; state.clients = state.clients.filter(c => c.id !== id); save(); renderClients(); updateAllCounters(); }
 
-// ✅ ФУНКЦИИ ДЛЯ УПРАВЛЕНИЯ ДОГОВОРАМИ
 function renderContracts() {
   const tbody = document.getElementById('contractsTable');
   if (state.contracts.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>Нет договоров</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>Нет договоров. Создайте первый договор для заявителей.</p></div></td></tr>';
     return;
   }
   const now = new Date();
@@ -1552,7 +1549,7 @@ function renderContracts() {
     const client = c.clientId ? getClient(c.clientId) : null;
     const endDate = new Date(c.endDate);
     const isActive = now <= endDate;
-    return '<tr><td><strong>' + c.number + '</strong></td><td>' + c.name + '</td><td>' + (client ? client.name : '—') + '</td><td>' + formatDate(c.startDate) + '</td><td>' + formatDate(c.endDate) + '</td><td><span class="badge-status ' + (isActive ? 'status-new' : 'status-closed') + '">' + (isActive ? 'Активен' : 'Истёк') + '</span></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openContractModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteContract(\'' + c.id + '\')">🗑️</button></td></tr>';
+    return '<tr><td><strong>' + c.number + '</strong></td><td>' + c.name + '</td><td>' + (client ? client.name : '—') + '</td><td>' + formatDate(c.startDate) + '</td><td>' + formatDate(c.endDate) + '</td><td><span class="badge-status ' + (isActive ? 'status-new' : 'status-closed') + '">' + (isActive ? '✅ Активен' : '❌ Истёк') + '</span></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openContractModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteContract(\'' + c.id + '\')">🗑️</button></td></tr>';
   }).join('');
 }
 
@@ -1588,7 +1585,6 @@ window.saveContract = function(e) {
     return;
   }
   
-  // Проверяем уникальность номера
   const existingContract = state.contracts.find(c => c.number === number && c.id !== id);
   if (existingContract) {
     toast('Договор с таким номером уже существует', 'error');
@@ -1648,245 +1644,4 @@ function renderSettings() {
         const dep = getDepartment(u.departmentId); 
         c.innerHTML = '<div class="settings-section"><h3>👤 Мой профиль</h3><div style="display:flex;gap:15px;align-items:center;margin-bottom:20px;padding:15px;background:var(--bg);border-radius:8px"><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#10b981,#34d399);color:white;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600">' + getInitials(u.fullName) + '</div><div><div style="font-size:16px;font-weight:600">' + u.fullName + '</div><div style="font-size:12px;color:var(--text-light)">' + u.phone + '</div><div style="font-size:12px;color:var(--text-light);margin-top:3px">' + (dep ? dep.name : 'Без отдела') + ' • <span class="role-badge role-' + u.role + '">' + ROLE_LABELS[u.role] + '</span></div></div></div><div class="form-group"><label>ФИО</label><input type="text" id="profileFullName" value="' + u.fullName + '"></div><div class="form-group"><label>Телефон</label><input type="tel" id="profilePhone" value="' + u.phone + '"></div><div class="form-group"><label>Новый пин-код (4 цифры)</label><input type="password" id="profilePin" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div><button class="btn btn-primary" onclick="window.saveProfile()">💾 Сохранить</button></div>'; 
     } else if (currentSettingsTab === 'system' && isAdmin()) { 
-        c.innerHTML = '<div class="settings-section"><h3>⚙️ Настройки системы</h3><div class="form-group"><label>Название компании</label><input type="text" id="setCompanyName" value="' + (state.settings.companyName || '') + '"></div><div class="form-group"><label>Тема оформления</label><select id="setTheme"><option value="light" ' + (state.settings.theme==='light'?'selected':'') + '>🌿 Светлая</option><option value="dark" ' + (state.settings.theme==='dark'?'selected':'') + '>🌑 Тёмная</option></select></div><div class="form-group"><label>Автоархивация решённых заявок (часы)</label><input type="number" id="setAutoArchive" value="' + (state.settings.autoArchiveHours || 24) + '" min="1" max="720"><div class="form-hint">Заявки автоматически переносятся в архив через указанное время после решения</div></div><div class="form-group"><label>👤 Ответственный за заявки заявителей</label><select id="setDefaultAssignee"><option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (state.settings.defaultAssigneeId === u.id ? 'selected' : '') + '>' + u.fullName + '</option>').join('') + '</select><div class="form-hint">Заявки от заявителей будут автоматически назначаться на этого сотрудника</div></div><div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="setSoundEnabled" ' + (state.settings.soundEnabled !== false ? 'checked' : '') + ' style="width:auto">🔔 Звуковые уведомления</label><div class="form-hint">Включить звуковые сигналы при новых событиях</div></div><button class="btn btn-primary" onclick="window.saveSystemSettings()">💾 Сохранить настройки</button></div><div class="settings-section"><h3>💾 Экспорт / Импорт данных</h3><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"><button class="btn btn-primary" onclick="window.exportData()">📤 Экспорт в JSON</button><button class="btn" onclick="document.getElementById(\'importFile\').click()">📥 Импорт из JSON</button><input type="file" id="importFile" style="display:none" accept=".json" onchange="window.importData(event)"></div><div style="padding:12px;background:#fee2e2;border-radius:6px;color:#991b1b"><strong>⚠️ Опасная зона</strong><div style="margin-top:8px"><button class="btn btn-danger btn-small" onclick="window.resetDemoData()">🔄 Сбросить все данные</button></div></div></div>'; 
-    } else if (currentSettingsTab === 'categories' && isAdmin()) { 
-        c.innerHTML = '<div class="settings-section"><h3>📂 Категории</h3><div>' + state.categories.map(cat => '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:8px;background:var(--bg);border-radius:6px"><input type="color" value="' + cat.color + '" onchange="window.updateCategory(\'' + cat.id + '\',\'color\',this.value)" style="width:40px;height:30px;border:none;cursor:pointer"><input type="text" value="' + cat.name + '" onchange="window.updateCategory(\'' + cat.id + '\',\'name\',this.value)" style="flex:1;padding:5px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text)"><button class="btn btn-small btn-danger" onclick="window.deleteCategory(\'' + cat.id + '\')">×</button></div>').join('') + '</div></div>'; 
-    } else if (currentSettingsTab === 'data' && isAdmin()) { 
-        c.innerHTML = '<div class="settings-section"><h3>💾 Данные</h3><div style="padding:12px;background:#fee2e2;border-radius:6px;color:#991b1b"><strong>⚠️ Опасная зона</strong><div style="margin-top:8px"><button class="btn btn-danger btn-small" onclick="window.resetDemoData()">🔄 Сбросить всё</button></div></div></div>'; 
-    } else { 
-        c.innerHTML = '<div class="empty-state"><p>Нет доступа</p></div>'; 
-    } 
-}
-function saveProfile() { 
-    const u = getCurrentUser(); 
-    u.fullName = document.getElementById('profileFullName').value; 
-    u.phone = document.getElementById('profilePhone').value; 
-    const newPin = document.getElementById('profilePin').value; 
-    if (newPin) { 
-        if (!/^\d{4}$/.test(newPin)) { toast('Пин должен быть 4 цифры', 'error'); return; } 
-        u.pin = newPin; 
-    } 
-    save(); 
-    renderCurrentUser(); 
-    toast('Профиль обновлён'); 
-    renderSettings(); 
-}
-function saveSystemSettings() {
-    state.settings.companyName = document.getElementById('setCompanyName').value;
-    state.settings.theme = document.getElementById('setTheme').value;
-    state.settings.autoArchiveHours = parseInt(document.getElementById('setAutoArchive').value) || 24;
-    state.settings.defaultAssigneeId = document.getElementById('setDefaultAssignee').value;
-    state.settings.soundEnabled = document.getElementById('setSoundEnabled').checked;
-    document.documentElement.setAttribute('data-theme', state.settings.theme);
-    save();
-    toast('✅ Настройки системы сохранены');
-    renderSettings();
-    updateAllCounters();
-}
-function updateCategory(id, field, value) { const c = getCategory(id); if (c) { c[field] = value; save(); } }
-function deleteCategory(id) { if (!confirm('Удалить?')) return; state.categories = state.categories.filter(c => c.id !== id); save(); renderSettings(); }
-function resetDemoData() { if (!confirm('Сбросить все данные?')) return; Object.keys(localStorage).filter(k => k.startsWith('hd_')).forEach(k => localStorage.removeItem(k)); location.reload(); }
-
-function exportData() {
-  const data = { users: state.users, departments: state.departments, clients: state.clients, companies: state.companies, contracts: state.contracts, tickets: state.tickets, categories: state.categories, settings: state.settings, exportDate: new Date().toISOString(), version: '1.0' };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'yarmarka-crm-backup-' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('📤 Данные экспортированы');
-}
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  if (!confirm('Импорт заменит все текущие данные. Продолжить?')) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.users) state.users = data.users;
-      if (data.departments) state.departments = data.departments;
-      if (data.clients) state.clients = data.clients;
-      if (data.companies) state.companies = data.companies;
-      if (data.contracts) state.contracts = data.contracts;
-      if (data.tickets) state.tickets = data.tickets;
-      if (data.categories) state.categories = data.categories;
-      if (data.settings) state.settings = data.settings;
-      save();
-      toast('📥 Данные импортированы');
-      location.reload();
-    } catch (err) {
-      toast('❌ Ошибка импорта: ' + err.message, 'error');
-    }
-  };
-  reader.readAsText(file);
-}
-
-document.getElementById('ticketViewModal').addEventListener('click', function(e) { if (e.target === this) closeTicketModal(); });
-
-// ✅ ПОЛНЫЙ ЭКСПОРТ ВСЕХ ФУНКЦИЙ В WINDOW
-window.switchLoginTab = switchLoginTab;
-window.selectLoginUser = selectLoginUser;
-window.doLogin = doLogin;
-window.doRegister = doRegister;
-window.doLogout = doLogout;
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.closeTicketModal = closeTicketModal;
-window.refreshTicketModal = refreshTicketModal;
-window.resolveTicketFromModal = resolveTicketFromModal;
-window.reopenTicketFromModal = reopenTicketFromModal;
-window.deleteTicketFromModal = deleteTicketFromModal;
-window.sendReplyFromModal = sendReplyFromModal;
-window.openPostponeModal = openPostponeModal;
-window.setPostponePreset = setPostponePreset;
-window.confirmPostpone = confirmPostpone;
-window.updateTicketField = updateTicketField;
-window.toggleRecurrence = toggleRecurrence;
-window.openTicketModal = openTicketModal;
-window.saveTicket = saveTicket;
-window.toggleRecurrenceConfig = toggleRecurrenceConfig;
-window.setRecurrencePreset = setRecurrencePreset;
-window.selectTicket = selectTicket;
-window.selectStatusFilter = selectStatusFilter;
-window.renderStatusCards = renderStatusCards;
-window.populateFilters = populateFilters;
-window.filterTickets = filterTickets;
-window.getVisibleTickets = getVisibleTickets;
-window.openClientModal = openClientModal;
-window.saveClient = saveClient;
-window.deleteClient = deleteClient;
-window.openContractModal = openContractModal;
-window.saveContract = saveContract;
-window.deleteContract = deleteContract;
-window.openCompanyModal = openCompanyModal;
-window.saveCompany = saveCompany;
-window.deleteCompany = deleteCompany;
-window.openDepartmentModal = openDepartmentModal;
-window.saveDepartment = saveDepartment;
-window.deleteDepartment = deleteDepartment;
-window.openUserModal = openUserModal;
-window.saveUser = saveUser;
-window.deleteUser = deleteUser;
-window.saveProfile = saveProfile;
-window.saveSystemSettings = saveSystemSettings;
-window.updateCategory = updateCategory;
-window.deleteCategory = deleteCategory;
-window.resetDemoData = resetDemoData;
-window.exportData = exportData;
-window.importData = importData;
-window.renderTickets = renderTickets;
-window.renderDashboard = renderDashboard;
-window.renderClients = renderClients;
-window.renderCompanies = renderCompanies;
-window.renderContracts = renderContracts;
-window.renderStaff = renderStaff;
-window.renderReports = renderReports;
-window.renderDepartments = renderDepartments;
-window.renderUsers = renderUsers;
-window.renderSettings = renderSettings;
-window.renderRecurring = renderRecurring;
-window.renderBarChart = renderBarChart;
-window.updateAllCounters = updateAllCounters;
-
-async function initApp() {
-  console.log('🚀 Инициализация приложения...');
-  
-  const loaded = await loadFromFirebase();
-  
-  if (!loaded || state.users.length === 0) {
-    const localUsers = JSON.parse(localStorage.getItem('hd_users')) || [];
-    if (localUsers.length > 0) {
-      console.log('📦 Загружаем из localStorage:', localUsers.length, 'пользователей');
-      state.users = localUsers;
-      state.departments = JSON.parse(localStorage.getItem('hd_departments')) || [];
-      state.clients = JSON.parse(localStorage.getItem('hd_clients')) || [];
-      state.companies = JSON.parse(localStorage.getItem('hd_companies')) || [];
-      state.contracts = JSON.parse(localStorage.getItem('hd_contracts')) || [];
-      state.tickets = JSON.parse(localStorage.getItem('hd_tickets')) || [];
-      state.categories = JSON.parse(localStorage.getItem('hd_categories')) || [];
-      state.settings = JSON.parse(localStorage.getItem('hd_settings')) || { theme: 'light', companyName: 'Ярмарка CRM', autoArchiveHours: 24, soundEnabled: true, defaultAssigneeId: '' };
-      await saveToFirebase();
-    }
-  }
-  
-  if (state.users.length === 0) {
-    console.log('🆕 Создаём демо-данные с администратором (пин 1408)...');
-    seedData();
-    await saveToFirebase();
-  }
-  
-  console.log('👥 Итого пользователей:', state.users.length);
-  const admin = state.users.find(u => u.role === 'admin');
-  console.log('👤 Администратор:', admin ? admin.fullName + ' (пин: ' + admin.pin + ')' : 'НЕ НАЙДЕН');
-  console.log('📄 Договоров:', state.contracts.length);
-
-  onSnapshot(doc(db, 'crm_data', 'main'), (doc) => {
-    if (doc.exists() && !isSaving) {
-      const newData = doc.data();
-      if (newData.users && newData.users.length > 0) {
-        state.users = newData.users;
-        state.departments = newData.departments || state.departments;
-        state.clients = newData.clients || state.clients;
-        state.companies = newData.companies || state.companies;
-        state.contracts = newData.contracts || state.contracts || [];
-        state.tickets = newData.tickets || state.tickets;
-        state.categories = newData.categories || state.categories;
-        state.settings = newData.settings || state.settings;
-        
-        if (document.getElementById('page-tickets')?.classList.contains('active')) renderTickets();
-        if (document.getElementById('page-recurring')?.classList.contains('active')) renderRecurring();
-        if (document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboard();
-        if (document.getElementById('ticketViewModal')?.classList.contains('active') && selectedTicketId) {
-          const t = state.tickets.find(x => x.id === selectedTicketId);
-          if (t) openTicketViewModal(t);
-        }
-        if (document.getElementById('page-staff')?.classList.contains('active')) renderStaff();
-        if (document.getElementById('page-users')?.classList.contains('active')) renderUsers();
-        if (document.getElementById('page-departments')?.classList.contains('active')) renderDepartments();
-        if (document.getElementById('page-contracts')?.classList.contains('active')) renderContracts();
-        
-        updateAllCounters();
-      }
-    }
-  });
-
-  if (state.settings.theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-  
-  // Заполняем категории в форме заявителя
-  const categorySelect = document.getElementById('publicTicketCategory');
-  if (categorySelect) {
-    categorySelect.innerHTML = '<option value="">Не выбрана</option>' + state.categories.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
-  }
-  
-  // Проверяем сессию заявителя
-  if (state.clientSession && state.clientSession.clientId) {
-    const client = getClient(state.clientSession.clientId);
-    const contract = getContract(state.clientSession.contractId);
-    if (client && contract) {
-      const now = new Date();
-      const endDate = new Date(contract.endDate);
-      if (now <= endDate) {
-        CURRENT_CLIENT_ID = client.id;
-        CURRENT_CONTRACT_ID = contract.id;
-        showClientDashboard();
-        return;
-      }
-    }
-  }
-  
-  checkAuth();
-  startAutoArchive();
-}
-
-initApp();
-
-setInterval(() => { if (CURRENT_USER_ID) processRecurringTickets(); }, 30000);
-setTimeout(() => { if (CURRENT_USER_ID) processRecurringTickets(); }, 3000);
-console.log('%c🎪 Ярмарка CRM - Единая база Firebase', 'color:#10b981;font-size:16px;font-weight:bold');
-</script>
-</body>
-</html>
+        c.innerHTML = '<div class="settings-section"><h3>⚙️ Настройки системы</h3><div class="form-group"><label>Название компании</label><input type="text" id="setCompanyName" value="' + (state.settings.companyName || '') + '"></div><div class="form-group"><label>Тема оформления</label><select id="setTheme"><option value="light" ' + (state.settings.theme==='light'?'selected':'') + '>🌿 Светлая</option><option value="dark" ' + (state.settings.theme==='dark'?'selected':'') + '>🌑 Тёмная</option></select></div><div class="form-group"><label>Автоархивация решённых заявок (часы)</label><input type="number" id="setAutoArchive" value="' + (state.settings.autoArchiveHours || 24) + '" min="1" max="720"><div class="form-hint">Заявки автоматически переносятся в архив через указанное время после решения</div></div><div class="form-group"><label>👤 Ответственный за заявки заявителей</label><select id="setDefaultAssignee"><option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (state.settings.defaultAssigneeId === u.id ? 'selected' : '') + '>' + u.fullName + '</option>').join('') + '</select><div class="form-hint">Заявки от заявителей будут автоматически назначаться на этого сотрудника</div></div><div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="setSoundEnabled" ' + (state.settings.soundEnabled !== false ? 'checked' : '') + ' style="width:auto">🔔 Звуковые уведомления</label><div class="form-hint">Включить звуковые сигналы при новых событиях</div></div><button class="btn btn-primary" onclick="window.saveSystemSettings()">💾 Сохранить настройки</button></div><
