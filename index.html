@@ -1644,4 +1644,245 @@ function renderSettings() {
         const dep = getDepartment(u.departmentId); 
         c.innerHTML = '<div class="settings-section"><h3>👤 Мой профиль</h3><div style="display:flex;gap:15px;align-items:center;margin-bottom:20px;padding:15px;background:var(--bg);border-radius:8px"><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#10b981,#34d399);color:white;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600">' + getInitials(u.fullName) + '</div><div><div style="font-size:16px;font-weight:600">' + u.fullName + '</div><div style="font-size:12px;color:var(--text-light)">' + u.phone + '</div><div style="font-size:12px;color:var(--text-light);margin-top:3px">' + (dep ? dep.name : 'Без отдела') + ' • <span class="role-badge role-' + u.role + '">' + ROLE_LABELS[u.role] + '</span></div></div></div><div class="form-group"><label>ФИО</label><input type="text" id="profileFullName" value="' + u.fullName + '"></div><div class="form-group"><label>Телефон</label><input type="tel" id="profilePhone" value="' + u.phone + '"></div><div class="form-group"><label>Новый пин-код (4 цифры)</label><input type="password" id="profilePin" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div><button class="btn btn-primary" onclick="window.saveProfile()">💾 Сохранить</button></div>'; 
     } else if (currentSettingsTab === 'system' && isAdmin()) { 
-        c.innerHTML = '<div class="settings-section"><h3>⚙️ Настройки системы</h3><div class="form-group"><label>Название компании</label><input type="text" id="setCompanyName" value="' + (state.settings.companyName || '') + '"></div><div class="form-group"><label>Тема оформления</label><select id="setTheme"><option value="light" ' + (state.settings.theme==='light'?'selected':'') + '>🌿 Светлая</option><option value="dark" ' + (state.settings.theme==='dark'?'selected':'') + '>🌑 Тёмная</option></select></div><div class="form-group"><label>Автоархивация решённых заявок (часы)</label><input type="number" id="setAutoArchive" value="' + (state.settings.autoArchiveHours || 24) + '" min="1" max="720"><div class="form-hint">Заявки автоматически переносятся в архив через указанное время после решения</div></div><div class="form-group"><label>👤 Ответственный за заявки заявителей</label><select id="setDefaultAssignee"><option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (state.settings.defaultAssigneeId === u.id ? 'selected' : '') + '>' + u.fullName + '</option>').join('') + '</select><div class="form-hint">Заявки от заявителей будут автоматически назначаться на этого сотрудника</div></div><div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="setSoundEnabled" ' + (state.settings.soundEnabled !== false ? 'checked' : '') + ' style="width:auto">🔔 Звуковые уведомления</label><div class="form-hint">Включить звуковые сигналы при новых событиях</div></div><button class="btn btn-primary" onclick="window.saveSystemSettings()">💾 Сохранить настройки</button></div><
+        c.innerHTML = '<div class="settings-section"><h3>⚙️ Настройки системы</h3><div class="form-group"><label>Название компании</label><input type="text" id="setCompanyName" value="' + (state.settings.companyName || '') + '"></div><div class="form-group"><label>Тема оформления</label><select id="setTheme"><option value="light" ' + (state.settings.theme==='light'?'selected':'') + '>🌿 Светлая</option><option value="dark" ' + (state.settings.theme==='dark'?'selected':'') + '>🌑 Тёмная</option></select></div><div class="form-group"><label>Автоархивация решённых заявок (часы)</label><input type="number" id="setAutoArchive" value="' + (state.settings.autoArchiveHours || 24) + '" min="1" max="720"><div class="form-hint">Заявки автоматически переносятся в архив через указанное время после решения</div></div><div class="form-group"><label>👤 Ответственный за заявки заявителей</label><select id="setDefaultAssignee"><option value="">Не назначен</option>' + state.users.map(u => '<option value="' + u.id + '" ' + (state.settings.defaultAssigneeId === u.id ? 'selected' : '') + '>' + u.fullName + '</option>').join('') + '</select><div class="form-hint">Заявки от заявителей будут автоматически назначаться на этого сотрудника</div></div><div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="setSoundEnabled" ' + (state.settings.soundEnabled !== false ? 'checked' : '') + ' style="width:auto">🔔 Звуковые уведомления</label><div class="form-hint">Включить звуковые сигналы при новых событиях</div></div><button class="btn btn-primary" onclick="window.saveSystemSettings()">💾 Сохранить настройки</button></div><div class="settings-section"><h3>💾 Экспорт / Импорт данных</h3><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"><button class="btn btn-primary" onclick="window.exportData()">📤 Экспорт в JSON</button><button class="btn" onclick="document.getElementById(\'importFile\').click()">📥 Импорт из JSON</button><input type="file" id="importFile" style="display:none" accept=".json" onchange="window.importData(event)"></div><div style="padding:12px;background:#fee2e2;border-radius:6px;color:#991b1b"><strong>⚠️ Опасная зона</strong><div style="margin-top:8px"><button class="btn btn-danger btn-small" onclick="window.resetDemoData()">🔄 Сбросить все данные</button></div></div></div>'; 
+    } else if (currentSettingsTab === 'categories' && isAdmin()) { 
+        c.innerHTML = '<div class="settings-section"><h3>📂 Категории</h3><div>' + state.categories.map(cat => '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:8px;background:var(--bg);border-radius:6px"><input type="color" value="' + cat.color + '" onchange="window.updateCategory(\'' + cat.id + '\',\'color\',this.value)" style="width:40px;height:30px;border:none;cursor:pointer"><input type="text" value="' + cat.name + '" onchange="window.updateCategory(\'' + cat.id + '\',\'name\',this.value)" style="flex:1;padding:5px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text)"><button class="btn btn-small btn-danger" onclick="window.deleteCategory(\'' + cat.id + '\')">×</button></div>').join('') + '</div></div>'; 
+    } else if (currentSettingsTab === 'data' && isAdmin()) { 
+        c.innerHTML = '<div class="settings-section"><h3>💾 Данные</h3><div style="padding:12px;background:#fee2e2;border-radius:6px;color:#991b1b"><strong>⚠️ Опасная зона</strong><div style="margin-top:8px"><button class="btn btn-danger btn-small" onclick="window.resetDemoData()">🔄 Сбросить всё</button></div></div></div>'; 
+    } else { 
+        c.innerHTML = '<div class="empty-state"><p>Нет доступа</p></div>'; 
+    } 
+}
+function saveProfile() { 
+    const u = getCurrentUser(); 
+    u.fullName = document.getElementById('profileFullName').value; 
+    u.phone = document.getElementById('profilePhone').value; 
+    const newPin = document.getElementById('profilePin').value; 
+    if (newPin) { 
+        if (!/^\d{4}$/.test(newPin)) { toast('Пин должен быть 4 цифры', 'error'); return; } 
+        u.pin = newPin; 
+    } 
+    save(); 
+    renderCurrentUser(); 
+    toast('Профиль обновлён'); 
+    renderSettings(); 
+}
+function saveSystemSettings() {
+    state.settings.companyName = document.getElementById('setCompanyName').value;
+    state.settings.theme = document.getElementById('setTheme').value;
+    state.settings.autoArchiveHours = parseInt(document.getElementById('setAutoArchive').value) || 24;
+    state.settings.defaultAssigneeId = document.getElementById('setDefaultAssignee').value;
+    state.settings.soundEnabled = document.getElementById('setSoundEnabled').checked;
+    document.documentElement.setAttribute('data-theme', state.settings.theme);
+    save();
+    toast('✅ Настройки системы сохранены');
+    renderSettings();
+    updateAllCounters();
+}
+function updateCategory(id, field, value) { const c = getCategory(id); if (c) { c[field] = value; save(); } }
+function deleteCategory(id) { if (!confirm('Удалить?')) return; state.categories = state.categories.filter(c => c.id !== id); save(); renderSettings(); }
+function resetDemoData() { if (!confirm('Сбросить все данные?')) return; Object.keys(localStorage).filter(k => k.startsWith('hd_')).forEach(k => localStorage.removeItem(k)); location.reload(); }
+
+function exportData() {
+  const data = { users: state.users, departments: state.departments, clients: state.clients, companies: state.companies, contracts: state.contracts, tickets: state.tickets, categories: state.categories, settings: state.settings, exportDate: new Date().toISOString(), version: '1.0' };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'yarmarka-crm-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('📤 Данные экспортированы');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!confirm('Импорт заменит все текущие данные. Продолжить?')) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.users) state.users = data.users;
+      if (data.departments) state.departments = data.departments;
+      if (data.clients) state.clients = data.clients;
+      if (data.companies) state.companies = data.companies;
+      if (data.contracts) state.contracts = data.contracts;
+      if (data.tickets) state.tickets = data.tickets;
+      if (data.categories) state.categories = data.categories;
+      if (data.settings) state.settings = data.settings;
+      save();
+      toast('📥 Данные импортированы');
+      location.reload();
+    } catch (err) {
+      toast('❌ Ошибка импорта: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('ticketViewModal').addEventListener('click', function(e) { if (e.target === this) closeTicketModal(); });
+
+window.switchLoginTab = switchLoginTab;
+window.selectLoginUser = selectLoginUser;
+window.doLogin = doLogin;
+window.doRegister = doRegister;
+window.doLogout = doLogout;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.closeTicketModal = closeTicketModal;
+window.refreshTicketModal = refreshTicketModal;
+window.resolveTicketFromModal = resolveTicketFromModal;
+window.reopenTicketFromModal = reopenTicketFromModal;
+window.deleteTicketFromModal = deleteTicketFromModal;
+window.sendReplyFromModal = sendReplyFromModal;
+window.openPostponeModal = openPostponeModal;
+window.setPostponePreset = setPostponePreset;
+window.confirmPostpone = confirmPostpone;
+window.updateTicketField = updateTicketField;
+window.toggleRecurrence = toggleRecurrence;
+window.openTicketModal = openTicketModal;
+window.saveTicket = saveTicket;
+window.toggleRecurrenceConfig = toggleRecurrenceConfig;
+window.setRecurrencePreset = setRecurrencePreset;
+window.selectTicket = selectTicket;
+window.selectStatusFilter = selectStatusFilter;
+window.renderStatusCards = renderStatusCards;
+window.populateFilters = populateFilters;
+window.filterTickets = filterTickets;
+window.getVisibleTickets = getVisibleTickets;
+window.openClientModal = openClientModal;
+window.saveClient = saveClient;
+window.deleteClient = deleteClient;
+window.openContractModal = openContractModal;
+window.saveContract = saveContract;
+window.deleteContract = deleteContract;
+window.openCompanyModal = openCompanyModal;
+window.saveCompany = saveCompany;
+window.deleteCompany = deleteCompany;
+window.openDepartmentModal = openDepartmentModal;
+window.saveDepartment = saveDepartment;
+window.deleteDepartment = deleteDepartment;
+window.openUserModal = openUserModal;
+window.saveUser = saveUser;
+window.deleteUser = deleteUser;
+window.saveProfile = saveProfile;
+window.saveSystemSettings = saveSystemSettings;
+window.updateCategory = updateCategory;
+window.deleteCategory = deleteCategory;
+window.resetDemoData = resetDemoData;
+window.exportData = exportData;
+window.importData = importData;
+window.renderTickets = renderTickets;
+window.renderDashboard = renderDashboard;
+window.renderClients = renderClients;
+window.renderCompanies = renderCompanies;
+window.renderContracts = renderContracts;
+window.renderStaff = renderStaff;
+window.renderReports = renderReports;
+window.renderDepartments = renderDepartments;
+window.renderUsers = renderUsers;
+window.renderSettings = renderSettings;
+window.renderRecurring = renderRecurring;
+window.renderBarChart = renderBarChart;
+window.updateAllCounters = updateAllCounters;
+
+async function initApp() {
+  console.log('🚀 Инициализация приложения...');
+  
+  const loaded = await loadFromFirebase();
+  
+  if (!loaded || state.users.length === 0) {
+    const localUsers = JSON.parse(localStorage.getItem('hd_users')) || [];
+    if (localUsers.length > 0) {
+      console.log('📦 Загружаем из localStorage:', localUsers.length, 'пользователей');
+      state.users = localUsers;
+      state.departments = JSON.parse(localStorage.getItem('hd_departments')) || [];
+      state.clients = JSON.parse(localStorage.getItem('hd_clients')) || [];
+      state.companies = JSON.parse(localStorage.getItem('hd_companies')) || [];
+      state.contracts = JSON.parse(localStorage.getItem('hd_contracts')) || [];
+      state.tickets = JSON.parse(localStorage.getItem('hd_tickets')) || [];
+      state.categories = JSON.parse(localStorage.getItem('hd_categories')) || [];
+      state.settings = JSON.parse(localStorage.getItem('hd_settings')) || { theme: 'light', companyName: 'Ярмарка CRM', autoArchiveHours: 24, soundEnabled: true, defaultAssigneeId: '' };
+      await saveToFirebase();
+    }
+  }
+  
+  if (state.users.length === 0) {
+    console.log('🆕 Создаём демо-данные с администратором (пин 1408)...');
+    seedData();
+    await saveToFirebase();
+  }
+  
+  console.log('👥 Итого пользователей:', state.users.length);
+  console.log('📄 Договоров:', state.contracts.length);
+  const admin = state.users.find(u => u.role === 'admin');
+  console.log('👤 Администратор:', admin ? admin.fullName + ' (пин: ' + admin.pin + ')' : 'НЕ НАЙДЕН');
+
+  onSnapshot(doc(db, 'crm_data', 'main'), (doc) => {
+    if (doc.exists() && !isSaving) {
+      const newData = doc.data();
+      if (newData.users && newData.users.length > 0) {
+        state.users = newData.users;
+        state.departments = newData.departments || state.departments;
+        state.clients = newData.clients || state.clients;
+        state.companies = newData.companies || state.companies;
+        state.contracts = newData.contracts || state.contracts || [];
+        state.tickets = newData.tickets || state.tickets;
+        state.categories = newData.categories || state.categories;
+        state.settings = newData.settings || state.settings;
+        
+        if (document.getElementById('page-tickets')?.classList.contains('active')) renderTickets();
+        if (document.getElementById('page-recurring')?.classList.contains('active')) renderRecurring();
+        if (document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboard();
+        if (document.getElementById('ticketViewModal')?.classList.contains('active') && selectedTicketId) {
+          const t = state.tickets.find(x => x.id === selectedTicketId);
+          if (t) openTicketViewModal(t);
+        }
+        if (document.getElementById('page-staff')?.classList.contains('active')) renderStaff();
+        if (document.getElementById('page-users')?.classList.contains('active')) renderUsers();
+        if (document.getElementById('page-departments')?.classList.contains('active')) renderDepartments();
+        if (document.getElementById('page-contracts')?.classList.contains('active')) renderContracts();
+        
+        updateAllCounters();
+      }
+    }
+  });
+
+  if (state.settings.theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  
+  const categorySelect = document.getElementById('publicTicketCategory');
+  if (categorySelect) {
+    categorySelect.innerHTML = '<option value="">Не выбрана</option>' + state.categories.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
+  }
+  
+  if (state.clientSession && state.clientSession.clientId) {
+    const client = getClient(state.clientSession.clientId);
+    const contract = getContract(state.clientSession.contractId);
+    if (client && contract) {
+      const now = new Date();
+      const endDate = new Date(contract.endDate);
+      if (now <= endDate) {
+        CURRENT_CLIENT_ID = client.id;
+        CURRENT_CONTRACT_ID = contract.id;
+        showClientDashboard();
+        return;
+      } else {
+        state.clientSession = null;
+        save();
+      }
+    }
+  }
+  
+  showClientPortal();
+  startAutoArchive();
+}
+
+initApp();
+
+setInterval(() => { if (CURRENT_USER_ID) processRecurringTickets(); }, 30000);
+setTimeout(() => { if (CURRENT_USER_ID) processRecurringTickets(); }, 3000);
+console.log('%c🎪 Ярмарка CRM - Единая база Firebase', 'color:#10b981;font-size:16px;font-weight:bold');
+</script>
+</body>
+</html>
