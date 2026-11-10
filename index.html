@@ -476,11 +476,28 @@ function processRecurringTickets() {
     createdCount++;
     toast('🔁 Создан экземпляр ' + newInstance.number);
   });
-  if (createdCount > 0) { save(); if (document.getElementById('page-tickets').classList.contains('active')) renderTickets(); if (document.getElementById('page-recurring').classList.contains('active')) renderRecurring(); }
+  if (createdCount > 0) { save(); if (document.getElementById('page-tickets').classList.contains('active')) renderTickets(); if (document.getElementById('page-recurring').classList.contains('active')) renderRecurring(); updateAllCounters(); }
 }
 
 function toggleRecurrenceConfig() { const enabled = document.getElementById('recurrenceEnabled').checked; document.getElementById('recurrenceConfig').classList.toggle('active', enabled); if (enabled && !document.getElementById('recurrenceFirstRun').value) { const d = new Date(Date.now() + 3600000); document.getElementById('recurrenceFirstRun').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); } }
 function setRecurrencePreset(period, interval) { document.getElementById('recurrenceEnabled').checked = true; document.getElementById('recurrencePeriod').value = period; document.getElementById('recurrenceInterval').value = interval; document.getElementById('recurrenceConfig').classList.add('active'); document.querySelectorAll('.recurrence-presets button').forEach(b => b.classList.remove('active')); if (event && event.target) event.target.classList.add('active'); }
+
+// ✅ НОВАЯ ФУНКЦИЯ: обновление счётчиков в боковом меню
+function updateAllCounters() {
+  const visible = getVisibleTickets();
+  const openTickets = visible.filter(t => t.status === 'new' || t.status === 'open').length;
+  const badgeTickets = document.getElementById('navBadgeTickets');
+  if (badgeTickets) {
+    badgeTickets.textContent = openTickets;
+    badgeTickets.style.display = openTickets > 0 ? '' : 'none';
+  }
+  const recurringCount = visible.filter(t => t.recurrence && t.recurrence.enabled).length;
+  const badgeRecurring = document.getElementById('navBadgeRecurring');
+  if (badgeRecurring) {
+    badgeRecurring.textContent = recurringCount;
+    badgeRecurring.style.display = recurringCount > 0 ? '' : 'none';
+  }
+}
 
 async function checkAuth() {
   console.log('🔐 Проверка авторизации...');
@@ -499,7 +516,7 @@ async function checkAuth() {
 }
 
 function showLogin() { document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('appSidebar').style.display = 'none'; document.getElementById('appMain').style.display = 'none'; renderUserPicker(); renderRegDepartments(); }
-function showApp() { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('appSidebar').style.display = ''; document.getElementById('appMain').style.display = ''; applyPermissions(); renderCurrentUser(); renderTickets(); }
+function showApp() { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('appSidebar').style.display = ''; document.getElementById('appMain').style.display = ''; applyPermissions(); renderCurrentUser(); renderTickets(); updateAllCounters(); }
 function applyPermissions() { const admin = isAdmin(); document.querySelectorAll('.admin-only').forEach(el => { el.style.display = admin ? '' : 'none'; }); }
 function renderCurrentUser() { const u = getCurrentUser(); if (!u) return; const dep = getDepartment(u.departmentId); document.getElementById('currentUserName').textContent = u.fullName; document.getElementById('currentUserRole').textContent = (dep ? dep.name + ' • ' : '') + ROLE_LABELS[u.role]; document.getElementById('currentUserAvatar').textContent = getInitials(u.fullName); }
 
@@ -565,7 +582,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.ge
 
 document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active'); const page = item.dataset.page; document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-' + page).classList.add('active'); if (page === 'dashboard') renderDashboard(); if (page === 'clients') renderClients(); if (page === 'companies') renderCompanies(); if (page === 'staff') renderStaff(); if (page === 'reports') renderReports(); if (page === 'tickets') renderTickets(); if (page === 'recurring') renderRecurring(); if (page === 'departments') renderDepartments(); if (page === 'users') renderUsers(); if (page === 'settings') renderSettings(); }); });
 
-// ✅ ДОБАВЛЕННЫЕ ФУНКЦИИ (которых не хватало)
 function openPostponeModal(id) {
     const t = state.tickets.find(x => x.id === id);
     if (!t) return;
@@ -600,6 +616,7 @@ function confirmPostpone() {
     closeModal('postponeModal'); 
     toast('⏸ Заявка отложена'); 
     renderTickets(); 
+    updateAllCounters();
     if (document.getElementById('ticketViewModal').classList.contains('active')) {
         closeTicketModal();
     }
@@ -675,6 +692,7 @@ function filterTickets() {
 }
 
 function renderTickets() { 
+    updateAllCounters();
     renderStatusCards();
     populateFilters(); 
     const filtered = filterTickets(); 
@@ -768,6 +786,7 @@ function resolveTicketFromModal(id) {
     save();
     toast('✅ Заявка решена');
     closeTicketModal();
+    updateAllCounters();
 }
 
 function reopenTicketFromModal(id) {
@@ -783,6 +802,7 @@ function reopenTicketFromModal(id) {
     save();
     toast('🔓 Заявка открыта заново');
     refreshTicketModal();
+    updateAllCounters();
 }
 
 function deleteTicketFromModal(id) {
@@ -792,6 +812,7 @@ function deleteTicketFromModal(id) {
     save();
     toast('Заявка удалена');
     closeTicketModal();
+    updateAllCounters();
 }
 
 function sendReplyFromModal(ticketId) {
@@ -808,6 +829,7 @@ function sendReplyFromModal(ticketId) {
     save();
     toast('Ответ отправлен');
     refreshTicketModal();
+    updateAllCounters();
 }
 
 function updateTicketField(id, field, value) { 
@@ -836,6 +858,7 @@ function updateTicketField(id, field, value) {
     save(); 
     toast('Обновлено'); 
     renderTickets(); 
+    updateAllCounters();
 }
 
 function toggleRecurrence(id) { 
@@ -850,6 +873,7 @@ function toggleRecurrence(id) {
     save(); 
     toast(t.recurrence.enabled ? '🔁 Повторение возобновлено' : '⏸ Повторение приостановлено'); 
     renderTickets(); 
+    updateAllCounters();
     if (document.getElementById('page-recurring').classList.contains('active')) renderRecurring(); 
     if (document.getElementById('ticketViewModal').classList.contains('active')) refreshTicketModal(); 
 }
@@ -919,31 +943,32 @@ function saveTicket(e) {
     save(); 
     closeModal('ticketModal'); 
     renderTickets(); 
+    updateAllCounters();
 }
 
 function renderRecurring() { const list = document.getElementById('recurringList'); const templates = state.tickets.filter(t => t.recurrence); if (templates.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔁</div><p>Нет повторяющихся заявок</p></div>'; return; } list.innerHTML = templates.map(t => { const rec = t.recurrence; const client = getClient(t.clientId); const agent = getUser(t.assigneeId); const dep = agent ? getDepartment(agent.departmentId) : null; const instances = state.tickets.filter(x => x.recurringParentId === t.id).length; return '<div class="card" style="margin-bottom:12px;padding:15px;border-left:3px solid #8b5cf6"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap"><span style="font-size:18px">🔁</span><strong style="font-size:14px;color:var(--primary-dark)">' + t.subject + '</strong><span class="badge-status status-' + t.status + '">' + STATUS_LABELS[t.status] + '</span>' + (rec.enabled ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">АКТИВНО</span>' : '<span style="background:#e5e7eb;color:#374151;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">ПРИОСТАНОВЛЕНО</span>') + '</div><div style="font-size:11px;color:var(--text-light);display:flex;gap:12px;flex-wrap:wrap"><span>📋 ' + t.number + '</span><span>👤 ' + (client ? client.name : '—') + '</span><span>🧑‍💼 ' + (agent ? agent.fullName : 'Не назначен') + '</span>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '') + '<span>🔁 <strong>' + formatRecurrence(rec) + '</strong></span><span>📄 Экземпляров: <strong>' + (rec.currentCount || 0) + '</strong></span></div><div style="font-size:11px;color:var(--text-light);margin-top:5px">' + (rec.lastRunAt ? 'Последнее: ' + formatDateTime(rec.lastRunAt) + ' • ' : '') + (rec.nextRunAt ? 'Следующее: <strong>' + formatDateTime(rec.nextRunAt) + '</strong>' : '') + '</div></div><div style="display:flex;gap:5px;align-items:center"><button class="btn btn-small" onclick="window.selectTicket(\'' + t.id + '\')">👁 Открыть</button><button class="btn btn-small" onclick="window.toggleRecurrence(\'' + t.id + '\')">' + (rec.enabled ? '⏸ Пауза' : '▶ Старт') + '</button></div></div></div>'; }).join(''); }
 
 function renderClients() { const tbody = document.getElementById('clientsTable'); if (state.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Нет заявителей</p></div></td></tr>'; return; } tbody.innerHTML = state.clients.map(c => { const ticketCount = state.tickets.filter(t => t.clientId === c.id).length; const company = c.companyId ? getCompany(c.companyId) : null; return '<tr><td><span class="avatar-small">' + getInitials(c.name) + '</span>' + c.name + '</td><td>' + c.email + '</td><td>' + (c.phone || '—') + '</td><td>' + (company ? company.name : '—') + '</td><td><strong>' + ticketCount + '</strong></td><td class="actions-cell"><button class="btn btn-small" onclick="window.openClientModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteClient(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
 function openClientModal(id) { document.getElementById('clientForm').reset(); document.getElementById('clientId').value = ''; document.getElementById('clientModalTitle').textContent = 'Новый заявитель'; document.getElementById('clientCompany').innerHTML = '<option value="">Без компании</option>' + state.companies.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (id) { const c = getClient(id); document.getElementById('clientId').value = c.id; document.getElementById('clientName').value = c.name; document.getElementById('clientEmail').value = c.email; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientCompany').value = c.companyId || ''; document.getElementById('clientModalTitle').textContent = 'Редактировать'; } openModal('clientModal'); }
-function saveClient(e) { e.preventDefault(); const id = document.getElementById('clientId').value; const data = { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, companyId: document.getElementById('clientCompany').value }; if (id) Object.assign(getClient(id), data); else state.clients.push({ id: 'c' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('clientModal'); renderClients(); }
-function deleteClient(id) { if (!confirm('Удалить?')) return; state.clients = state.clients.filter(c => c.id !== id); save(); renderClients(); }
+function saveClient(e) { e.preventDefault(); const id = document.getElementById('clientId').value; const data = { name: document.getElementById('clientName').value, email: document.getElementById('clientEmail').value, phone: document.getElementById('clientPhone').value, companyId: document.getElementById('clientCompany').value }; if (id) Object.assign(getClient(id), data); else state.clients.push({ id: 'c' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('clientModal'); renderClients(); updateAllCounters(); }
+function deleteClient(id) { if (!confirm('Удалить?')) return; state.clients = state.clients.filter(c => c.id !== id); save(); renderClients(); updateAllCounters(); }
 
 function renderCompanies() { const tbody = document.getElementById('companiesTable'); if (state.companies.length === 0) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>Нет компаний</p></div></td></tr>'; return; } tbody.innerHTML = state.companies.map(c => { const clientCount = state.clients.filter(cl => cl.companyId === c.id).length; const ticketCount = state.tickets.filter(t => { const cl = getClient(t.clientId); return cl && cl.companyId === c.id; }).length; return '<tr><td><strong>' + c.name + '</strong></td><td>' + (c.domain || '—') + '</td><td>' + clientCount + '</td><td>' + ticketCount + '</td><td class="actions-cell"><button class="btn btn-small" onclick="window.openCompanyModal(\'' + c.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteCompany(\'' + c.id + '\')">🗑️</button></td></tr>'; }).join(''); }
 function openCompanyModal(id) { document.getElementById('companyForm').reset(); document.getElementById('companyId').value = ''; document.getElementById('companyModalTitle').textContent = 'Новая компания'; if (id) { const c = getCompany(id); document.getElementById('companyId').value = c.id; document.getElementById('companyName').value = c.name; document.getElementById('companyDomain').value = c.domain || ''; document.getElementById('companyModalTitle').textContent = 'Редактировать'; } openModal('companyModal'); }
-function saveCompany(e) { e.preventDefault(); const id = document.getElementById('companyId').value; const data = { name: document.getElementById('companyName').value, domain: document.getElementById('companyDomain').value }; if (id) Object.assign(getCompany(id), data); else state.companies.push({ id: 'co' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('companyModal'); renderCompanies(); }
-function deleteCompany(id) { if (!confirm('Удалить?')) return; state.companies = state.companies.filter(c => c.id !== id); state.clients.forEach(c => { if (c.companyId === id) c.companyId = ''; }); save(); renderCompanies(); }
+function saveCompany(e) { e.preventDefault(); const id = document.getElementById('companyId').value; const data = { name: document.getElementById('companyName').value, domain: document.getElementById('companyDomain').value }; if (id) Object.assign(getCompany(id), data); else state.companies.push({ id: 'co' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('companyModal'); renderCompanies(); updateAllCounters(); }
+function deleteCompany(id) { if (!confirm('Удалить?')) return; state.companies = state.companies.filter(c => c.id !== id); state.clients.forEach(c => { if (c.companyId === id) c.companyId = ''; }); save(); renderCompanies(); updateAllCounters(); }
 
 function renderStaff() { const tbody = document.getElementById('staffTable'); tbody.innerHTML = state.users.map(u => { const dep = getDepartment(u.departmentId); const open = state.tickets.filter(t => t.assigneeId === u.id && !['solved','closed'].includes(t.status)).length; const solved = state.tickets.filter(t => t.assigneeId === u.id && (t.status === 'solved' || t.status === 'closed')).length; return '<tr><td><span class="avatar-small">' + getInitials(u.fullName) + '</span>' + u.fullName + (u.id === CURRENT_USER_ID ? ' <span style="font-size:10px;color:var(--primary);font-weight:600">← вы</span>' : '') + '</td><td>' + u.phone + '</td><td>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '—') + '</td><td><span class="role-badge role-' + u.role + '">' + ROLE_LABELS[u.role] + '</span></td><td><strong>' + open + '</strong></td><td><strong>' + solved + '</strong></td></tr>'; }).join(''); }
 
 function renderDepartments() { if (!isAdmin()) return; const list = document.getElementById('departmentsList'); if (state.departments.length === 0) { list.innerHTML = '<div class="empty-state"><p>Нет отделов</p></div>'; return; } list.innerHTML = state.departments.map(d => { const members = state.users.filter(u => u.departmentId === d.id); const ticketsCount = state.tickets.filter(t => { const u = getUser(t.assigneeId); return u && u.departmentId === d.id; }).length; return '<div class="card" style="margin-bottom:12px;padding:15px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;background:' + d.color + ';display:flex;align-items:center;justify-content:center;color:white;font-size:18px">🏛</div><div><div style="font-weight:600;font-size:15px">' + d.name + '</div><div style="font-size:12px;color:var(--text-light)">' + (d.description || 'Без описания') + ' • 📥 ' + ticketsCount + ' заявок</div></div></div><div style="display:flex;gap:5px"><button class="btn btn-small" onclick="window.openDepartmentModal(\'' + d.id + '\')">✏️</button><button class="btn btn-small btn-danger" onclick="window.deleteDepartment(\'' + d.id + '\')">🗑️</button></div></div><div style="font-size:12px;color:var(--text-light);margin-bottom:8px">👥 Сотрудники (' + members.length + '):</div><div style="display:flex;flex-wrap:wrap;gap:6px">' + (members.length ? members.map(u => '<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg);border-radius:15px;font-size:12px"><span class="avatar-small" style="width:20px;height:20px;font-size:9px;margin:0">' + getInitials(u.fullName) + '</span>' + u.fullName + (u.role === 'admin' ? ' <span style="font-size:9px;background:#fef3c7;color:#92400e;padding:1px 5px;border-radius:8px">ADMIN</span>' : '') + '</span>').join('') : '<span style="font-size:12px;color:var(--text-muted);font-style:italic">Нет сотрудников</span>') + '</div></div>'; }).join(''); }
 function openDepartmentModal(id) { if (!isAdmin()) return; document.getElementById('departmentForm').reset(); document.getElementById('departmentId').value = ''; document.getElementById('departmentModalTitle').textContent = 'Новый отдел'; if (id) { const d = getDepartment(id); document.getElementById('departmentId').value = d.id; document.getElementById('departmentName').value = d.name; document.getElementById('departmentDescription').value = d.description || ''; document.getElementById('departmentColor').value = d.color || '#10b981'; document.getElementById('departmentModalTitle').textContent = 'Редактировать отдел'; } openModal('departmentModal'); }
-function saveDepartment(e) { e.preventDefault(); const id = document.getElementById('departmentId').value; const data = { name: document.getElementById('departmentName').value, description: document.getElementById('departmentDescription').value, color: document.getElementById('departmentColor').value }; if (id) Object.assign(getDepartment(id), data); else state.departments.push({ id: 'dep' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('departmentModal'); renderDepartments(); }
-function deleteDepartment(id) { if (!isAdmin()) return; if (!confirm('Удалить отдел?')) return; state.departments = state.departments.filter(d => d.id !== id); state.users.forEach(u => { if (u.departmentId === id) u.departmentId = ''; }); save(); renderDepartments(); }
+function saveDepartment(e) { e.preventDefault(); const id = document.getElementById('departmentId').value; const data = { name: document.getElementById('departmentName').value, description: document.getElementById('departmentDescription').value, color: document.getElementById('departmentColor').value }; if (id) Object.assign(getDepartment(id), data); else state.departments.push({ id: 'dep' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('departmentModal'); renderDepartments(); updateAllCounters(); }
+function deleteDepartment(id) { if (!isAdmin()) return; if (!confirm('Удалить отдел?')) return; state.departments = state.departments.filter(d => d.id !== id); state.users.forEach(u => { if (u.departmentId === id) u.departmentId = ''; }); save(); renderDepartments(); updateAllCounters(); }
 
 function renderUsers() { if (!isAdmin()) return; const tbody = document.getElementById('usersTable'); tbody.innerHTML = state.users.map(u => { const dep = getDepartment(u.departmentId); return '<tr><td><span class="avatar-small">' + getInitials(u.fullName) + '</span>' + u.fullName + (u.id === CURRENT_USER_ID ? ' <span style="font-size:10px;color:var(--primary);font-weight:600">← вы</span>' : '') + '</td><td>' + u.phone + '</td><td>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '—') + '</td><td><span class="role-badge role-' + u.role + '">' + ROLE_LABELS[u.role] + '</span></td><td><span class="pin-display">' + u.pin + '</span></td><td style="font-size:11px;color:var(--text-light)">' + formatDate(u.createdAt) + '</td><td class="actions-cell"><button class="btn btn-small" onclick="window.openUserModal(\'' + u.id + '\')">✏️</button>' + (u.id !== CURRENT_USER_ID ? '<button class="btn btn-small btn-danger" onclick="window.deleteUser(\'' + u.id + '\')">🗑️</button>' : '') + '</td></tr>'; }).join(''); }
 function openUserModal(id) { if (!isAdmin()) return; const u = getUser(id); if (!u) return; document.getElementById('userForm').reset(); document.getElementById('userId').value = u.id; document.getElementById('userFullName').value = u.fullName; document.getElementById('userPhone').value = u.phone; document.getElementById('userRole').value = u.role; document.getElementById('userPin').value = ''; document.getElementById('userDepartment').innerHTML = '<option value="">Без отдела</option>' + state.departments.map(d => '<option value="' + d.id + '" ' + (u.departmentId === d.id ? 'selected' : '') + '>' + d.name + '</option>').join(''); document.getElementById('userModalTitle').textContent = 'Редактировать: ' + u.fullName; openModal('userModal'); }
-function saveUser(e) { e.preventDefault(); const id = document.getElementById('userId').value; const u = getUser(id); if (!u) return; const newPin = document.getElementById('userPin').value; u.fullName = document.getElementById('userFullName').value; u.phone = document.getElementById('userPhone').value; u.departmentId = document.getElementById('userDepartment').value; u.role = document.getElementById('userRole').value; if (newPin && /^\d{4}$/.test(newPin)) u.pin = newPin; else if (newPin && !/^\d{4}$/.test(newPin)) { toast('Пин должен быть 4 цифры', 'error'); return; } save(); closeModal('userModal'); renderUsers(); toast('Пользователь обновлён'); }
-function deleteUser(id) { if (!isAdmin()) return; if (id === CURRENT_USER_ID) { toast('Нельзя удалить себя', 'error'); return; } if (!confirm('Удалить пользователя?')) return; state.users = state.users.filter(u => u.id !== id); state.tickets.forEach(t => { if (t.assigneeId === id) t.assigneeId = ''; }); save(); renderUsers(); }
+function saveUser(e) { e.preventDefault(); const id = document.getElementById('userId').value; const u = getUser(id); if (!u) return; const newPin = document.getElementById('userPin').value; u.fullName = document.getElementById('userFullName').value; u.phone = document.getElementById('userPhone').value; u.departmentId = document.getElementById('userDepartment').value; u.role = document.getElementById('userRole').value; if (newPin && /^\d{4}$/.test(newPin)) u.pin = newPin; else if (newPin && !/^\d{4}$/.test(newPin)) { toast('Пин должен быть 4 цифры', 'error'); return; } save(); closeModal('userModal'); renderUsers(); toast('Пользователь обновлён'); updateAllCounters(); }
+function deleteUser(id) { if (!isAdmin()) return; if (id === CURRENT_USER_ID) { toast('Нельзя удалить себя', 'error'); return; } if (!confirm('Удалить пользователя?')) return; state.users = state.users.filter(u => u.id !== id); state.tickets.forEach(t => { if (t.assigneeId === id) t.assigneeId = ''; }); save(); renderUsers(); updateAllCounters(); }
 
 function renderDashboard() { const visible = getVisibleTickets(); const total = visible.length; const open = visible.filter(t => ['new','open','pending'].includes(t.status)).length; const solved = visible.filter(t => t.status === 'solved' || t.status === 'closed').length; const myOpen = visible.filter(t => t.assigneeId === CURRENT_USER_ID && !['solved','closed'].includes(t.status)).length; const mySolved = visible.filter(t => t.assigneeId === CURRENT_USER_ID && (t.status === 'solved' || t.status === 'closed')).length; const recurringCount = visible.filter(t => t.recurrence && t.recurrence.enabled).length; const title = isAdmin() ? '📊 Общая статистика' : '📊 Моя статистика'; document.getElementById('dashboardContent').innerHTML = '<h2 style="margin-bottom:15px;color:var(--primary-dark)">' + title + '</h2><div class="stats-grid"><div class="stat-card"><div class="stat-label">Всего заявок</div><div class="stat-value">' + total + '</div></div><div class="stat-card"><div class="stat-label">Открытых</div><div class="stat-value" style="color:var(--warning)">' + open + '</div></div><div class="stat-card"><div class="stat-label">Решённых</div><div class="stat-value" style="color:var(--success)">' + solved + '</div></div><div class="stat-card"><div class="stat-label">Мои открытые</div><div class="stat-value">' + myOpen + '</div></div><div class="stat-card"><div class="stat-label">Мои решённые</div><div class="stat-value" style="color:var(--success)">' + mySolved + '</div></div><div class="stat-card"><div class="stat-label">🔁 Повторяющихся</div><div class="stat-value" style="color:#8b5cf6">' + recurringCount + '</div></div></div><div class="report-card"><h3>📊 По статусам</h3><div class="bar-chart" id="dashChart1"></div></div>' + (isAdmin() ? '<div class="report-card"><h3>👥 Загрузка по сотрудникам</h3><div class="bar-chart" id="dashChart2"></div></div><div class="report-card"><h3>🏛 Загрузка по отделам</h3><div class="bar-chart" id="dashChart3"></div></div>' : ''); renderBarChart('dashChart1', Object.entries(STATUS_LABELS).map(([k,v]) => ({ label: v, value: visible.filter(t => t.status === k).length }))); if (isAdmin()) { renderBarChart('dashChart2', state.users.map(u => ({ label: u.fullName.split(' ')[0], value: visible.filter(t => t.assigneeId === u.id && !['solved','closed'].includes(t.status)).length }))); renderBarChart('dashChart3', state.departments.map(d => ({ label: d.name, value: visible.filter(t => { const u = getUser(t.assigneeId); return u && u.departmentId === d.id && !['solved','closed'].includes(t.status); }).length }))); } }
 function renderBarChart(id, data) { const max = Math.max(...data.map(d => d.value), 1); document.getElementById(id).innerHTML = data.map(d => '<div class="bar-row"><div class="bar-label">' + d.label + '</div><div class="bar-track"><div class="bar-fill" style="width:' + ((d.value/max)*100) + '%">' + (d.value > 0 ? d.value : '') + '</div></div><div class="bar-value">' + d.value + '</div></div>').join(''); }
@@ -991,6 +1016,7 @@ function saveSystemSettings() {
     save();
     toast('✅ Настройки системы сохранены');
     renderSettings();
+    updateAllCounters();
 }
 function updateCategory(id, field, value) { const c = getCategory(id); if (c) { c[field] = value; save(); } }
 function deleteCategory(id) { if (!confirm('Удалить?')) return; state.categories = state.categories.filter(c => c.id !== id); save(); renderSettings(); }
@@ -1036,8 +1062,6 @@ function importData(event) {
 document.getElementById('ticketViewModal').addEventListener('click', function(e) { if (e.target === this) closeTicketModal(); });
 
 // ✅ ПОЛНЫЙ ЭКСПОРТ ВСЕХ ФУНКЦИЙ В WINDOW
-// Вставьте этот блок ПЕРЕД вызовом initApp()
-
 window.switchLoginTab = switchLoginTab;
 window.selectLoginUser = selectLoginUser;
 window.doLogin = doLogin;
@@ -1096,6 +1120,7 @@ window.renderUsers = renderUsers;
 window.renderSettings = renderSettings;
 window.renderRecurring = renderRecurring;
 window.renderBarChart = renderBarChart;
+window.updateAllCounters = updateAllCounters;
 
 async function initApp() {
   console.log('🚀 Инициализация приложения...');
@@ -1149,6 +1174,8 @@ async function initApp() {
         if (document.getElementById('page-staff')?.classList.contains('active')) renderStaff();
         if (document.getElementById('page-users')?.classList.contains('active')) renderUsers();
         if (document.getElementById('page-departments')?.classList.contains('active')) renderDepartments();
+        
+        updateAllCounters();
       }
     }
   });
