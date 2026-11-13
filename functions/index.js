@@ -300,6 +300,7 @@ exports.activateStaffAccount = onCall({ region: REGION }, async (request) => {
   const login = normalizeLogin(request.data && request.data.login);
   const code = requireString(request.data && request.data.activationCode, 'activationCode', 20, 128);
   const password = validatePassword(request.data && request.data.password);
+  await applyRateLimit('activation-ip', `${login}:${clientIp(request)}`, ACTIVATION_MAX_ATTEMPTS, 60 * 60 * 1000);
   const loginRef = db.collection(LOGIN_INDEX).doc(login);
   const loginSnap = await loginRef.get();
 
