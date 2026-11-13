@@ -225,16 +225,22 @@ exports.approveStaffApplication = onCall({ region: REGION }, async (request) => 
     const login = app.loginNormalized;
     const reservationRef = db.collection(LOGIN_RESERVATIONS).doc(login);
     const loginRef = db.collection(LOGIN_INDEX).doc(login);
-    const [reservationSnap, loginSnap, departmentSnap] = await Promise.all([
+    // The current CRM stores departments in crm_data/main, not in a
+    // top-level departments collection. Validate against that authoritative
+    // document until the data migration creates normalized department docs.
+    const [reservationSnap, loginSnap, crmSnap] = await Promise.all([
       tx.get(reservationRef),
       tx.get(loginRef),
-      tx.get(db.collection('departments').doc(departmentId))
+      tx.get(db.collection('crm_data').doc('main'))
     ]);
     if (!reservationSnap.exists || reservationSnap.data().applicationId !== applicationId) {
       fail('failed-precondition', 'Резервирование логина не найдено.');
     }
     if (loginSnap.exists) fail('already-exists', 'Логин уже используется.');
-    if (!departmentSnap.exists) fail('not-found', 'Выбранный отдел не найден.');
+    const departments = crmSnap.exists && Array.isArray(crmSnap.data().departments) ? crmSnap.data().departments : [];
+    if (!departments.some((department) => department && department.id === departmentId)) {
+      fail('not-found', 'Выбранный отдел не найден в CRM.');
+    }
 
     tx.create(loginRef, {
       applicationId,
