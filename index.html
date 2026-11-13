@@ -421,9 +421,10 @@ tr:hover td { background: var(--bg); }
     </div>
     <div class="login-form active" id="loginForm">
       <div class="login-error" id="loginError"></div>
-      <div class="login-field"><label>Выберите сотрудника</label><div class="user-picker" id="userPicker"></div></div>
-      <div class="login-field"><label>Пин-код (4 цифры)</label><input type="password" id="loginPin" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <button class="login-btn" onclick="window.doLogin()">Войти</button>
+      <div class="login-field"><label>Логин</label><input type="text" id="loginName" autocomplete="username" maxlength="40" placeholder="admin.login"></div>
+      <div class="login-field"><label>Пароль</label><input type="password" id="loginPassword" autocomplete="current-password" maxlength="256" placeholder="Введите пароль"></div>
+      <button class="login-btn" id="loginSubmitBtn" onclick="window.doLogin()">Войти</button>
+      <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:12px">Вход проверяется сервером. PIN-коды больше не используются.</p>
     </div>
     <div class="login-form" id="registerForm">
       <div class="login-error" id="registerError"></div>
@@ -529,8 +530,9 @@ tr:hover td { background: var(--bg); }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
+import { getAuth, signInWithCustomToken, signOut, connectAuthEmulator } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCrDBQkvL_ngTCaPxx_Gf3pdjpqkMwa4Fo",
@@ -544,10 +546,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const functions = getFunctions(app, "us-central1");
+const auth = getAuth(app);
+const emulatorMode = new URLSearchParams(window.location.search).get('emulator') === '1';
+if (emulatorMode) {
+  // Emulator mode is explicit and opt-in. It never silently changes the live app.
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+  connectFirestoreEmulator(db, '127.0.0.1', 8080);
+  connectFunctionsEmulator(functions, '127.0.0.1', 5001);
+}
 const submitStaffApplication = httpsCallable(functions, "submitStaffApplication");
 const listStaffApplications = httpsCallable(functions, "listStaffApplications");
 const approveStaffApplication = httpsCallable(functions, "approveStaffApplication");
 const rejectStaffApplication = httpsCallable(functions, "rejectStaffApplication");
+const loginWithPassword = httpsCallable(functions, "loginWithPassword");
 let isSaving = false;
 
 let state = { 
@@ -740,9 +751,8 @@ function showClientDashboard() {
 
 function showLogin() { 
   hideAllInterfaces();
-  document.getElementById('loginScreen').style.display = 'flex'; 
-  renderUserPicker(); 
-  renderRegDepartments(); 
+  document.getElementById('loginScreen').style.display = 'flex';
+  renderRegDepartments();
 }
 
 function showApp() { 
@@ -1199,19 +1209,51 @@ function renderUserPicker() {
 
 function selectLoginUser(id) { selectedLoginUserId = id; renderUserPicker(); document.getElementById('loginPin').focus(); }
 
-async function doLogin() { 
-    hideLoginError('loginError'); 
-    if (!selectedLoginUserId) { showLoginError('loginError', 'Выберите сотрудника'); return; } 
-    const pin = document.getElementById('loginPin').value; 
-    if (!/^\d{4}$/.test(pin)) { showLoginError('loginError', 'Пин-код должен содержать 4 цифры'); return; } 
-    const user = getUser(selectedLoginUserId); 
-    if (!user) { showLoginError('loginError', 'Пользователь не найден. Обновите страницу.'); return; } 
-    if (user.pin !== pin) { showLoginError('loginError', 'Неверный пин-код'); return; } 
-    CURRENT_USER_ID = user.id; 
-    state.session = { userId: user.id, loginAt: new Date().toISOString() }; 
-    save(); 
-    toast('👋 Добро пожаловать, ' + user.fullName.split(' ')[0] + '!'); 
-    showApp(); 
+async function doLogin() {
+    hideLoginError('loginError');
+    const login = document.getElementById('loginName').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const button = document.getElementById('loginSubmitBtn');
+    if (!login || !password) { showLoginError('loginError', 'Введите логин и пароль.'); return; }
+    button.disabled = true;
+    button.textContent = 'Проверка…';
+    try {
+      const result = await loginWithPassword({ login, password });
+      await signInWithCustomToken(auth, result.data.customToken);
+      const token = await auth.currentUser.getIdTokenResult(true);
+      if (!['admin', 'staff'].includes(token.claims.role)) {
+        await signOut(auth);
+        throw new Error('У аккаунта отсутствует разрешённая роль.');
+      }
+      if (token.claims.role !== 'admin') {
+        await signOut(auth);
+        throw new Error('Вход сотрудника через новый backend принят, но рабочий интерфейс ещё не переведён на защищённые коллекции. До миграции данных доступ закрыт.');
+      }
+      const legacyAdmin = state.users.find(user => user.role === 'admin');
+      if (!legacyAdmin) {
+        await signOut(auth);
+        throw new Error('В локальном интерфейсе не найден профиль администратора. Не создавайте его автоматически: требуется отдельная миграция профилей.');
+      }
+      CURRENT_USER_ID = legacyAdmin.id;
+      state.session = null; // Authentication persistence is owned by Firebase Auth.
+      selectedLoginUserId = null;
+      showApp();
+      document.querySelectorAll('.nav-item:not([data-page="staff-applications"])').forEach(item => item.style.display = 'none');
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.getElementById('page-staff-applications').classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      document.querySelector('[data-page="staff-applications"]').classList.add('active');
+      await loadStaffApplications();
+    } catch (error) {
+      console.error('Server login failed:', error);
+      const message = error.code === 'functions/unauthenticated'
+        ? 'Неверный логин или пароль.'
+        : (error.message || 'Не удалось выполнить вход.');
+      showLoginError('loginError', message);
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Войти';
+    }
 }
 
 async function doRegister() {
@@ -1271,7 +1313,7 @@ async function doRegister() {
     }
 }
 
-async function doLogout() { if (!confirm('Выйти из системы?')) return; state.session = null; CURRENT_USER_ID = null; selectedLoginUserId = null; selectedTicketId = null; save(); document.getElementById('loginPin').value = ''; showLogin(); }
+async function doLogout() { if (!confirm('Выйти из системы?')) return; state.session = null; CURRENT_USER_ID = null; selectedLoginUserId = null; selectedTicketId = null; save(); document.getElementById('loginPassword').value = ''; signOut(auth).catch(console.error); showLogin(); }
 function renderRegDepartments() { document.getElementById('regDepartment').innerHTML = '<option value="">— Выберите отдел —</option>' + state.departments.map(d => '<option value="' + d.id + '">' + d.name + '</option>').join(''); }
 document.addEventListener('input', e => { if (e.target.classList && e.target.classList.contains('pin-input')) { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); } });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') { if (document.getElementById('loginForm').classList.contains('active')) doLogin(); else if (document.getElementById('registerForm').classList.contains('active')) doRegister(); } if (e.key === 'Escape' && document.getElementById('ticketViewModal')?.classList.contains('active')) { closeTicketModal(); } });
