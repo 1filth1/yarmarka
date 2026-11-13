@@ -460,6 +460,7 @@ tr:hover td { background: var(--bg); }
     <div class="nav-section-title">Система</div>
     <div class="nav-item admin-only" data-page="departments"><span class="nav-icon">🏛</span><span>Отделы</span></div>
     <div class="nav-item admin-only" data-page="users"><span class="nav-icon">🔐</span><span>Пользователи</span></div>
+    <div class="nav-item admin-only" data-page="staff-applications"><span class="nav-icon">📨</span><span>Заявки сотрудников</span><span class="badge" id="navBadgeStaffApplications">0</span></div>
     <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span><span>Настройки</span></div>
   </div>
   <div class="sidebar-footer">
@@ -496,6 +497,14 @@ tr:hover td { background: var(--bg); }
   <div class="page" id="page-reports"><div class="topbar"><div class="topbar-title">📈 Отчёты</div></div><div class="reports-content" id="reportsContent"></div></div>
   <div class="page" id="page-departments"><div class="topbar"><div class="topbar-title">🏛 Отделы</div><div class="topbar-actions"><button class="btn btn-primary" onclick="window.openDepartmentModal()">+ Отдел</button></div></div><div class="page-content"><div id="departmentsList"></div></div></div>
   <div class="page" id="page-users"><div class="topbar"><div class="topbar-title">🔐 Пользователи</div></div><div class="page-content"><div style="margin-bottom:15px;padding:12px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;border-left:3px solid #f59e0b">🔐 Режим администратора</div><div class="card"><table><thead><tr><th>ФИО</th><th>Телефон</th><th>Отдел</th><th>Роль</th><th>Пин-код</th><th>Создан</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></div>
+  <div class="page" id="page-staff-applications">
+    <div class="topbar"><div class="topbar-title">📨 Заявки сотрудников</div><div class="topbar-actions"><button class="btn" onclick="window.loadStaffApplications()">↻ Обновить</button></div></div>
+    <div class="page-content">
+      <div class="card" style="margin-bottom:14px;padding:14px"><div style="font-weight:600;margin-bottom:6px">Подтверждение регистрации</div><div style="font-size:12px;color:var(--text-light);line-height:1.5">Проверяйте ФИО и телефон. После одобрения назначьте отдел и передайте одноразовый код активации лично сотруднику. Код показывается только один раз.</div></div>
+      <div id="staffApplicationsNotice" class="card" style="padding:14px;margin-bottom:14px;font-size:13px">Для просмотра очереди требуется активная серверная сессия администратора.</div>
+      <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>ФИО</th><th>Телефон</th><th>Логин</th><th>Отдел</th><th>Дата</th><th>Действия</th></tr></thead><tbody id="staffApplicationsTable"><tr><td colspan="6">Нажмите «Обновить».</td></tr></tbody></table></div></div>
+    </div>
+  </div>
   <div class="page" id="page-settings"><div class="topbar"><div class="topbar-title">⚙️ Настройки</div></div><div class="settings-layout"><div class="settings-nav"><div class="settings-nav-item active" data-settings="profile">Мой профиль</div><div class="settings-nav-item admin-only" data-settings="system">Система</div><div class="settings-nav-item admin-only" data-settings="categories">Категории</div><div class="settings-nav-item admin-only" data-settings="data">Данные</div></div><div class="settings-content" id="settingsContent"></div></div></div>
 </main>
 
@@ -536,6 +545,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const functions = getFunctions(app, "us-central1");
 const submitStaffApplication = httpsCallable(functions, "submitStaffApplication");
+const listStaffApplications = httpsCallable(functions, "listStaffApplications");
+const approveStaffApplication = httpsCallable(functions, "approveStaffApplication");
+const rejectStaffApplication = httpsCallable(functions, "rejectStaffApplication");
 let isSaving = false;
 
 let state = { 
@@ -1264,7 +1276,7 @@ function renderRegDepartments() { document.getElementById('regDepartment').inner
 document.addEventListener('input', e => { if (e.target.classList && e.target.classList.contains('pin-input')) { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); } });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') { if (document.getElementById('loginForm').classList.contains('active')) doLogin(); else if (document.getElementById('registerForm').classList.contains('active')) doRegister(); } if (e.key === 'Escape' && document.getElementById('ticketViewModal')?.classList.contains('active')) { closeTicketModal(); } });
 
-document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active'); const page = item.dataset.page; document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-' + page).classList.add('active'); if (page === 'dashboard') renderDashboard(); if (page === 'clients') renderClients(); if (page === 'companies') renderCompanies(); if (page === 'contracts') renderContracts(); if (page === 'staff') renderStaff(); if (page === 'reports') renderReports(); if (page === 'tickets') renderTickets(); if (page === 'recurring') renderRecurring(); if (page === 'departments') renderDepartments(); if (page === 'users') renderUsers(); if (page === 'settings') renderSettings(); }); });
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); item.classList.add('active'); const page = item.dataset.page; document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-' + page).classList.add('active'); if (page === 'dashboard') renderDashboard(); if (page === 'clients') renderClients(); if (page === 'companies') renderCompanies(); if (page === 'contracts') renderContracts(); if (page === 'staff') renderStaff(); if (page === 'reports') renderReports(); if (page === 'tickets') renderTickets(); if (page === 'recurring') renderRecurring(); if (page === 'departments') renderDepartments(); if (page === 'users') renderUsers(); if (page === 'staff-applications') loadStaffApplications(); if (page === 'settings') renderSettings(); }); });
 
 function openPostponeModal(id) {
     const t = state.tickets.find(x => x.id === id);
@@ -1776,6 +1788,63 @@ function openDepartmentModal(id) { if (!isAdmin()) return; document.getElementBy
 function saveDepartment(e) { e.preventDefault(); const id = document.getElementById('departmentId').value; const data = { name: document.getElementById('departmentName').value, description: document.getElementById('departmentDescription').value, color: document.getElementById('departmentColor').value }; if (id) Object.assign(getDepartment(id), data); else state.departments.push({ id: 'dep' + Date.now(), ...data, createdAt: new Date().toISOString() }); save(); closeModal('departmentModal'); renderDepartments(); updateAllCounters(); }
 function deleteDepartment(id) { if (!isAdmin()) return; if (!confirm('Удалить отдел?')) return; state.departments = state.departments.filter(d => d.id !== id); state.users.forEach(u => { if (u.departmentId === id) u.departmentId = ''; }); save(); renderDepartments(); updateAllCounters(); }
 
+function escapeHtml(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+
+async function loadStaffApplications() {
+  const notice = document.getElementById('staffApplicationsNotice');
+  const tbody = document.getElementById('staffApplicationsTable');
+  if (!isAdmin()) { notice.textContent = 'Доступ разрешён только администраторам.'; tbody.innerHTML = '<tr><td colspan="6">Недостаточно прав.</td></tr>'; return; }
+  notice.textContent = 'Загружаем очередь с сервера…';
+  tbody.innerHTML = '<tr><td colspan="6">Загрузка…</td></tr>';
+  try {
+    const result = await listStaffApplications({ status: 'pending', limit: 100 });
+    const applications = result.data.applications || [];
+    document.getElementById('navBadgeStaffApplications').textContent = applications.length;
+    notice.textContent = applications.length ? 'Ожидают проверки: ' + applications.length : 'Новых заявок пока нет.';
+    if (!applications.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-light)">Ожидающих заявок нет.</td></tr>'; return; }
+    tbody.innerHTML = applications.map(app => {
+      const departments = state.departments.map(dep => '<option value="' + escapeHtml(dep.id) + '">' + escapeHtml(dep.name) + '</option>').join('');
+      const date = app.createdAt ? new Date(app.createdAt).toLocaleString('ru-RU') : '—';
+      return '<tr><td>' + escapeHtml(app.fullName) + '</td><td>' + escapeHtml(app.phone) + '</td><td><code>' + escapeHtml(app.login) + '</code></td><td><select id="applicationDepartment-' + escapeHtml(app.id) + '"><option value="">Выберите отдел</option>' + departments + '</select></td><td>' + escapeHtml(date) + '</td><td class="actions-cell"><button class="btn btn-small btn-primary" onclick="window.approveStaffApplicationFromUi(\'' + escapeHtml(app.id) + '\')">Одобрить</button> <button class="btn btn-small btn-danger" onclick="window.rejectStaffApplicationFromUi(\'' + escapeHtml(app.id) + '\')">Отклонить</button></td></tr>';
+    }).join('');
+  } catch (error) {
+    console.error('Unable to load staff applications:', error);
+    notice.textContent = error.code === 'functions/unauthenticated' || error.code === 'functions/permission-denied'
+      ? 'Сервер отклонил запрос: необходима авторизация через Firebase с административной ролью. Старый локальный вход CRM пока не является серверной авторизацией.'
+      : 'Не удалось загрузить заявки. Проверьте развёртывание Cloud Functions и Firebase App Check.';
+    tbody.innerHTML = '<tr><td colspan="6">Очередь недоступна. Подробности — в консоли браузера.</td></tr>';
+  }
+}
+
+async function approveStaffApplicationFromUi(applicationId) {
+  if (!isAdmin()) return;
+  const departmentId = document.getElementById('applicationDepartment-' + applicationId)?.value;
+  if (!departmentId) { toast('Сначала выберите отдел.', 'error'); return; }
+  if (!confirm('Одобрить заявку и создать одноразовый код активации?')) return;
+  try {
+    const result = await approveStaffApplication({ applicationId, departmentId });
+    alert('Заявка одобрена. Передайте код сотруднику лично. Код отображается только сейчас:\n\n' + result.data.activationCode + '\n\nСрок действия: ' + new Date(result.data.expiresAt).toLocaleString('ru-RU'));
+    await loadStaffApplications();
+  } catch (error) {
+    console.error('Unable to approve staff application:', error);
+    toast('Не удалось одобрить заявку. Проверьте серверную авторизацию и настройки Firebase.', 'error');
+  }
+}
+
+async function rejectStaffApplicationFromUi(applicationId) {
+  if (!isAdmin()) return;
+  const reason = prompt('Причина отклонения (необязательно):') || '';
+  if (!confirm('Отклонить эту заявку?')) return;
+  try {
+    await rejectStaffApplication({ applicationId, reason: reason.trim() });
+    toast('Заявка отклонена.');
+    await loadStaffApplications();
+  } catch (error) {
+    console.error('Unable to reject staff application:', error);
+    toast('Не удалось отклонить заявку. Проверьте серверную авторизацию и настройки Firebase.', 'error');
+  }
+}
+
 function renderUsers() { if (!isAdmin()) return; const tbody = document.getElementById('usersTable'); tbody.innerHTML = state.users.map(u => { const dep = getDepartment(u.departmentId); return '<tr><td><span class="avatar-small">' + getInitials(u.fullName) + '</span>' + u.fullName + (u.id === CURRENT_USER_ID ? ' <span style="font-size:10px;color:var(--primary);font-weight:600">← вы</span>' : '') + '</td><td>' + u.phone + '</td><td>' + (dep ? '<span class="dept-badge" style="background:' + dep.color + '22;color:' + dep.color + '">' + dep.name + '</span>' : '—') + '</td><td><span class="role-badge role-' + u.role + '">' + ROLE_LABELS[u.role] + '</span></td><td><span class="pin-display">' + u.pin + '</span></td><td style="font-size:11px;color:var(--text-light)">' + formatDate(u.createdAt) + '</td><td class="actions-cell"><button class="btn btn-small" onclick="window.openUserModal(\'' + u.id + '\')">✏️</button>' + (u.id !== CURRENT_USER_ID ? '<button class="btn btn-small btn-danger" onclick="window.deleteUser(\'' + u.id + '\')">🗑️</button>' : '') + '</td></tr>'; }).join(''); }
 function openUserModal(id) { if (!isAdmin()) return; const u = getUser(id); if (!u) return; document.getElementById('userForm').reset(); document.getElementById('userId').value = u.id; document.getElementById('userFullName').value = u.fullName; document.getElementById('userPhone').value = u.phone; document.getElementById('userRole').value = u.role; document.getElementById('userPin').value = ''; document.getElementById('userDepartment').innerHTML = '<option value="">Без отдела</option>' + state.departments.map(d => '<option value="' + d.id + '" ' + (u.departmentId === d.id ? 'selected' : '') + '>' + d.name + '</option>').join(''); document.getElementById('userModalTitle').textContent = 'Редактировать: ' + u.fullName; openModal('userModal'); }
 function saveUser(e) { e.preventDefault(); const id = document.getElementById('userId').value; const u = getUser(id); if (!u) return; const newPin = document.getElementById('userPin').value; u.fullName = document.getElementById('userFullName').value; u.phone = document.getElementById('userPhone').value; u.departmentId = document.getElementById('userDepartment').value; u.role = document.getElementById('userRole').value; if (newPin && /^\d{4}$/.test(newPin)) u.pin = newPin; else if (newPin && !/^\d{4}$/.test(newPin)) { toast('Пин должен быть 4 цифры', 'error'); return; } save(); closeModal('userModal'); renderUsers(); toast('Пользователь обновлён'); updateAllCounters(); }
@@ -1946,6 +2015,9 @@ window.renderStaff = renderStaff;
 window.renderReports = renderReports;
 window.renderDepartments = renderDepartments;
 window.renderUsers = renderUsers;
+window.loadStaffApplications = loadStaffApplications;
+window.approveStaffApplicationFromUi = approveStaffApplicationFromUi;
+window.rejectStaffApplicationFromUi = rejectStaffApplicationFromUi;
 window.renderSettings = renderSettings;
 window.renderRecurring = renderRecurring;
 window.renderBarChart = renderBarChart;
