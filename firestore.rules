@@ -63,6 +63,10 @@ service cloud.firestore {
         || (isClient()
           && request.resource.data.clientUid == request.auth.uid
           && request.resource.data.keys().hasAll(['clientUid', 'status', 'createdAt'])
+          && request.resource.data.keys().hasOnly([
+            'clientUid', 'contractId', 'title', 'description', 'status', 'createdAt',
+            'updatedAt', 'categoryId', 'attachments'
+          ])
           && request.resource.data.status == 'new'
           && !request.resource.data.keys().hasAny(['assigneeUid', 'departmentId', 'internalNotes']));
 
