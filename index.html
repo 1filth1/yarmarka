@@ -258,6 +258,53 @@ tr:hover td { background: var(--bg); }
 .client-chat-input { display: flex; gap: 10px; }
 .client-chat-input textarea { flex: 1; min-height: 60px; }
 .client-chat-input .btn { height: 60px; }
+
+/* Yarmarka CRM — graphite & orange theme */
+:root {
+  --primary: #e87524 !important;
+  --primary-hover: #cc5f16 !important;
+  --primary-light: #fff0e5 !important;
+  --primary-dark: #a9470c !important;
+  --success: #3d8b65 !important;
+  --warning: #e39a32 !important;
+  --danger: #cf5148 !important;
+  --info: #6486a8 !important;
+  --bg: #f0f1f2 !important;
+  --card: #ffffff !important;
+  --text: #292d32 !important;
+  --text-light: #69717a !important;
+  --text-muted: #9299a1 !important;
+  --border: #d9dde1 !important;
+  --sidebar: #30353b !important;
+  --sidebar-hover: #41474f !important;
+}
+[data-theme="dark"] {
+  --bg: #202429 !important;
+  --card: #2b3036 !important;
+  --text: #edf0f2 !important;
+  --text-light: #b0b7bf !important;
+  --text-muted: #858e98 !important;
+  --border: #414850 !important;
+  --sidebar: #171b20 !important;
+  --sidebar-hover: #30363e !important;
+  --primary-light: #50331f !important;
+}
+body { background: var(--bg) !important; color: var(--text) !important; }
+.login-screen { background: linear-gradient(135deg, #252a30 0%, #3b4148 58%, #e87524 100%) !important; }
+.login-logo { background: linear-gradient(135deg, #e87524, #f39a56) !important; }
+.login-title { color: #30353b !important; }
+[data-theme="dark"] .login-title { color: #f1f3f5 !important; }
+.sidebar { background: var(--sidebar) !important; }
+.nav-item.active, .nav-item:hover { background: var(--sidebar-hover) !important; }
+.btn-primary, .login-btn, .btn-resolve { background: var(--primary) !important; border-color: var(--primary) !important; }
+.btn-primary:hover, .login-btn:hover, .btn-resolve:hover { background: var(--primary-hover) !important; }
+.btn-warning { background: #e39a32 !important; border-color: #e39a32 !important; }
+.badge, .role-badge, .dept-badge { border-color: var(--border); }
+.card, .stat-card, .info-card, .report-card, .client-card, .modal-content { border-color: var(--border) !important; }
+input:focus, select:focus, textarea:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(232,117,36,.14) !important; }
+a { color: var(--primary-dark); }
+[data-theme="dark"] a { color: #f39a56; }
+
 </style>
 </head>
 <body>
