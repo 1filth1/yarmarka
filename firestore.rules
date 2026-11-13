@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.role == 'admin';
+    }
+
+    function isStaff() {
+      return signedIn() && request.auth.token.role == 'staff';
+    }
+
+    function isClient() {
+      return signedIn() && request.auth.token.role == 'client';
+    }
+
+    function activeStaff() {
+      return isStaff()
+        && exists(/databases/$(database)/documents/staffProfiles/$(request.auth.uid))
+        && get(/databases/$(database)/documents/staffProfiles/$(request.auth.uid)).data.status == 'active';
+    }
+
+    function ticketExists(ticketId) {
+      return exists(/databases/$(database)/documents/tickets/$(ticketId));
+    }
+
+    function canReadTicket(ticketId) {
+      return isAdmin()
+        || (activeStaff()
+          && get(/databases/$(database)/documents/tickets/$(ticketId)).data.assigneeUid == request.auth.uid)
+        || (isClient()
+          && get(/databases/$(database)/documents/tickets/$(ticketId)).data.clientUid == request.auth.uid);
+    }
+
+    match /staffApplications/{applicationId} {
+      allow read, write: if false;
+    }
+
+    match /staffProfiles/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow create, update, delete: if false;
+    }
+
+    match /clients/{uid} {
+      allow read: if isAdmin() || (isClient() && request.auth.uid == uid);
+      allow write: if false;
+    }
+
+    match /contracts/{contractId} {
+      allow read: if isAdmin()
+        || (isClient()
+          && resource.data.clientUid == request.auth.uid);
+      allow write: if false;
+    }
+
+    match /tickets/{ticketId} {
+      allow read: if canReadTicket(ticketId);
+
+      allow create: if isAdmin()
+        || (isClient()
+          && request.resource.data.clientUid == request.auth.uid
+          && request.resource.data.keys().hasAll(['clientUid', 'status', 'createdAt'])
+          && request.resource.data.status == 'new'
+          && !request.resource.data.keys().hasAny(['assigneeUid', 'departmentId', 'internalNotes']));
+
+      allow update: if isAdmin()
+        || (activeStaff()
+          && resource.data.assigneeUid == request.auth.uid
+          && request.resource.data.assigneeUid == resource.data.assigneeUid
+          && request.resource.data.clientUid == resource.data.clientUid
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'staffReply', 'updatedAt', 'priority']));
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if canReadTicket(ticketId);
+        allow create: if canReadTicket(ticketId)
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.keys().hasAll(['senderUid', 'senderRole', 'text', 'createdAt'])
+          && request.resource.data.senderRole == request.auth.token.role
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 10000;
+        allow update, delete: if false;
+      }
+    }
+
+    match /departments/{departmentId} {
+      allow read: if isAdmin() || activeStaff();
+      allow write: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if isAdmin() || activeStaff() || isClient();
+      allow write: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Auth indexes, login throttles, reservations and audit events are server-only.
+    match /loginIndex/{loginId} {
+      allow read, write: if false;
+    }
+    match /loginReservations/{loginId} {
+      allow read, write: if false;
+    }
+    match /authRateLimits/{key} {
+      allow read, write: if false;
+    }
+    match /securityEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    // Legacy crm_data/main is intentionally not granted access by these rules.
+    // Do not deploy these rules until the app has been migrated to the new schema.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
