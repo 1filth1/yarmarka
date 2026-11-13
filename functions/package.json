@@ -6,7 +6,7 @@
     "node": "20"
   },
   "scripts": {
-    "lint": "node --check index.js && node --check scripts/set-admin-claims.js",
+    "lint": "node --check index.js && node --check scripts/set-admin-claims.js && node --check scripts/provision-admin.js",
     "set-admin": "node scripts/set-admin-claims.js"
   },
   "dependencies": {
