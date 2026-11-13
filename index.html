@@ -427,12 +427,12 @@ tr:hover td { background: var(--bg); }
     </div>
     <div class="login-form" id="registerForm">
       <div class="login-error" id="registerError"></div>
-      <div class="login-field"><label>ФИО *</label><input type="text" id="regFullName" placeholder="Иванов Иван Иванович"></div>
-      <div class="login-field"><label>Телефон *</label><input type="tel" id="regPhone" placeholder="+7 900 123-45-67"></div>
-      <div class="login-field"><label>Отдел *</label><select id="regDepartment"></select></div>
-      <div class="login-field"><label>Пин-код (4 цифры) *</label><input type="password" id="regPin" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <div class="login-field"><label>Подтвердите пин-код *</label><input type="password" id="regPinConfirm" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <button class="login-btn" onclick="window.doRegister()">Зарегистрироваться</button>
+      <div class="login-field"><label>ФИО *</label><input type="text" id="regFullName" autocomplete="name" placeholder="Иванов Иван Иванович" required></div>
+      <div class="login-field"><label>Телефон для связи *</label><input type="tel" id="regPhone" autocomplete="tel" placeholder="+7 900 123-45-67" required></div>
+      <div class="login-field"><label>Желаемый логин *</label><input type="text" id="regLogin" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9._-]+" placeholder="ivanov.i" required></div>
+      <div class="login-field"><label>Отдел *</label><select id="regDepartment" required></select></div>
+      <p style="font-size:12px;color:var(--text-light);line-height:1.5;margin:8px 0 14px">После отправки администратор вручную проверит заявку. До подтверждения вход в CRM недоступен. Пароль вы зададите после одобрения заявки.</p>
+      <button class="login-btn" id="registerSubmitBtn" onclick="window.doRegister()">Отправить заявку</button>
     </div>
   </div>
 </div>
@@ -521,6 +521,7 @@ tr:hover td { background: var(--bg); }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCrDBQkvL_ngTCaPxx_Gf3pdjpqkMwa4Fo",
@@ -533,6 +534,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const functions = getFunctions(app, "us-central1");
+const submitStaffApplication = httpsCallable(functions, "submitStaffApplication");
 let isSaving = false;
 
 let state = { 
@@ -1199,26 +1202,61 @@ async function doLogin() {
     showApp(); 
 }
 
-async function doRegister() { 
-    hideLoginError('registerError'); 
-    const fullName = document.getElementById('regFullName').value.trim(); 
-    const phone = document.getElementById('regPhone').value.trim(); 
-    const departmentId = document.getElementById('regDepartment').value; 
-    const pin = document.getElementById('regPin').value; 
-    const pinConfirm = document.getElementById('regPinConfirm').value; 
-    if (!fullName || fullName.split(' ').length < 2) { showLoginError('registerError', 'Введите ФИО полностью'); return; } 
-    if (!phone || phone.length < 5) { showLoginError('registerError', 'Введите корректный телефон'); return; } 
-    if (!departmentId) { showLoginError('registerError', 'Выберите отдел'); return; } 
-    if (!/^\d{4}$/.test(pin)) { showLoginError('registerError', 'Пин-код должен содержать 4 цифры'); return; } 
-    if (pin !== pinConfirm) { showLoginError('registerError', 'Пин-коды не совпадают'); return; } 
-    if (state.users.some(u => u.phone === phone)) { showLoginError('registerError', 'Телефон уже зарегистрирован'); return; } 
-    const newUser = { id: 'user-' + Date.now(), fullName, phone, pin, role: 'staff', departmentId, createdAt: new Date().toISOString() }; 
-    state.users.push(newUser);
-    CURRENT_USER_ID = newUser.id;
-    state.session = { userId: newUser.id, loginAt: new Date().toISOString() };
-    save();
-    toast('✅ Регистрация успешна! Добро пожаловать, ' + fullName.split(' ')[0] + '!');
-    showApp();
+async function doRegister() {
+    hideLoginError('registerError');
+    const button = document.getElementById('registerSubmitBtn');
+    const fullName = document.getElementById('regFullName').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const login = document.getElementById('regLogin').value.trim();
+    const departmentId = document.getElementById('regDepartment').value;
+    const department = state.departments.find(item => item.id === departmentId);
+
+    if (!fullName || fullName.split(/\\s+/).length < 2) {
+      showLoginError('registerError', 'Введите ФИО полностью.');
+      return;
+    }
+    if (!phone || phone.length < 5) {
+      showLoginError('registerError', 'Введите корректный телефон.');
+      return;
+    }
+    if (!/^[A-Za-z0-9._-]{3,32}$/.test(login)) {
+      showLoginError('registerError', 'Логин: 3–32 символа, латинские буквы, цифры, точка, дефис или подчёркивание.');
+      return;
+    }
+    if (!department) {
+      showLoginError('registerError', 'Выберите отдел.');
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Отправка заявки…';
+    try {
+      const result = await submitStaffApplication({
+        fullName,
+        phone,
+        login,
+        requestedDepartment: department.name
+      });
+      document.getElementById('registerForm').innerHTML =
+        '<div style="text-align:center;padding:18px 4px">' +
+        '<div style="font-size:34px;margin-bottom:12px">📨</div>' +
+        '<h3 style="margin-bottom:10px">Заявка отправлена</h3>' +
+        '<p style="font-size:13px;line-height:1.6;color:var(--text-light)">Администратор проверит ваши данные. До подтверждения заявки войти в CRM нельзя. После одобрения вам передадут одноразовый код для активации аккаунта и установки пароля.</p>' +
+        '<p style="font-size:11px;color:var(--text-muted);margin-top:12px">Номер заявки: ' + String(result.data.applicationId).replace(/[&<>"]/g, '') + '</p>' +
+        '<button class="login-btn" style="margin-top:18px" onclick="window.switchLoginTab(\\'login\\')">Вернуться ко входу</button>' +
+        '</div>';
+    } catch (error) {
+      console.error('Staff application submission failed:', error);
+      const messages = {
+        'functions/already-exists': 'Этот логин уже занят или ожидает рассмотрения. Выберите другой.',
+        'functions/resource-exhausted': 'Слишком много заявок с этого подключения. Попробуйте позже.',
+        'functions/invalid-argument': 'Проверьте введённые данные.',
+        'functions/unavailable': 'Сервер временно недоступен. Попробуйте позже.'
+      };
+      showLoginError('registerError', messages[error.code] || 'Не удалось отправить заявку. Попробуйте позже.');
+      button.disabled = false;
+      button.textContent = 'Отправить заявку';
+    }
 }
 
 async function doLogout() { if (!confirm('Выйти из системы?')) return; state.session = null; CURRENT_USER_ID = null; selectedLoginUserId = null; selectedTicketId = null; save(); document.getElementById('loginPin').value = ''; showLogin(); }
