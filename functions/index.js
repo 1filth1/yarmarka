@@ -361,6 +361,7 @@ exports.activateStaffAccount = onCall({ region: REGION }, async (request) => {
   });
   batch.update(loginRef, {
     status: 'active',
+    role: 'staff',
     passwordHash,
     passwordHashVersion: 1,
     activatedAt: FieldValue.serverTimestamp(),
@@ -397,7 +398,9 @@ exports.loginWithPassword = onCall({ region: REGION }, async (request) => {
   if (password.length > 256) fail('invalid-argument', 'Неверный логин или пароль.');
 
   const ip = clientIp(request);
-  await applyRateLimit('login', `${login}:${ip}`, LOGIN_MAX_ATTEMPTS, LOGIN_WINDOW_MS);
+  await applyRateLimit('login-ip', `${login}:${ip}`, LOGIN_MAX_ATTEMPTS, LOGIN_WINDOW_MS);
+  // A second, broader account-level ceiling slows distributed guessing without permanent lockout.
+  await applyRateLimit('login-account', login, 50, LOGIN_WINDOW_MS);
 
   const loginRef = db.collection(LOGIN_INDEX).doc(login);
   const snap = await loginRef.get();
@@ -417,15 +420,22 @@ exports.loginWithPassword = onCall({ region: REGION }, async (request) => {
     fail('unauthenticated', 'Неверный логин или пароль.');
   }
 
-  const profile = await db.collection(PROFILES).doc(record.uid).get();
-  if (!profile.exists || profile.data().status !== 'active') {
+  const role = record.role;
+  if (!['admin', 'staff'].includes(role)) {
     fail('permission-denied', 'Учётная запись отключена.');
   }
 
-  const customToken = await getAuth().createCustomToken(record.uid, {
-    role: 'staff',
-    departmentId: profile.data().departmentId
-  });
-  await audit('login_succeeded', record.uid);
+  let departmentId;
+  if (role === 'staff') {
+    const profile = await db.collection(PROFILES).doc(record.uid).get();
+    if (!profile.exists || profile.data().status !== 'active') {
+      fail('permission-denied', 'Учётная запись отключена.');
+    }
+    departmentId = profile.data().departmentId;
+  }
+
+  const claims = role === 'admin' ? { role: 'admin' } : { role: 'staff', departmentId };
+  const customToken = await getAuth().createCustomToken(record.uid, claims);
+  await audit('login_succeeded', record.uid, { role });
   return { customToken };
 });
