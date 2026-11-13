@@ -4,7 +4,7 @@ This backend is under development. It is **not deployed** by this repository cha
 
 ## Prerequisites
 
-- Node.js 20
+- Node.js 22
 - Firebase CLI
 - A dedicated non-production Firebase project for emulator/deployment testing
 - A service account only for trusted administrative provisioning; keep its JSON outside this repository
