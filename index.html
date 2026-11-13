@@ -543,11 +543,14 @@ const firebaseConfig = {
   appId: "1:182060849552:web:3eb7a8a6fb4d700bb6fb15"
 };
 
-const app = initializeApp(firebaseConfig);
+const emulatorMode = new URLSearchParams(window.location.search).get('emulator') === '1';
+const runtimeFirebaseConfig = emulatorMode
+  ? { ...firebaseConfig, projectId: "demo-yarmarka-test", authDomain: "demo-yarmarka-test.firebaseapp.com" }
+  : firebaseConfig;
+const app = initializeApp(runtimeFirebaseConfig);
 const db = getFirestore(app);
 const functions = getFunctions(app, "us-central1");
 const auth = getAuth(app);
-const emulatorMode = new URLSearchParams(window.location.search).get('emulator') === '1';
 if (emulatorMode) {
   // Emulator mode is explicit and opt-in. It never silently changes the live app.
   connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
